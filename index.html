@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOUMY | Užduotys V1.7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #fcfbfa; /* Japandi šviesus, natūralus fonas */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .kanban-col {
+            transition: background-color 0.2s ease;
+        }
+        .drag-over {
+            background-color: #f1f0ec !important;
+            border: 2px dashed #d1cecf;
+        }
+        .task-card {
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .task-card:active {
+            cursor: grabbing;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-gray-800 p-4 md:p-8">
+
+    <header class="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-6">
+        <div>
+            <h1 class="text-3xl font-bold tracking-wider text-gray-900">HOUMY</h1>
+            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo sistema • Realaus laiko versija 1.7</p>
+        </div>
+        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+            <button onclick="openHistoryModal()" class="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium flex items-center justify-center gap-1">
+                📋 Žurnalas
+            </button>
+            <button class="border border-gray-300 text-gray-400 px-4 py-2.5 rounded-xl text-sm font-medium cursor-default">
+                Debesų sinchronizacija ☁️ Aktyvi
+            </button>
+            <button onclick="openCreateModal()" class="flex-1 sm:flex-none bg-gray-900 text-white px-6 py-2.5 rounded-xl shadow-sm hover:bg-gray-800 transition font-medium text-sm tracking-wide">
+                + Nauja užduotis
+            </button>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto mb-8 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+        <div class="relative flex-1 max-w-md">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">🔍</span>
+            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none transition" placeholder="Paieška pagal pavadinimą arba aprašymą...">
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setFilter('all')" id="filter-all" class="px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent">Visi</button>
+            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas')" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Ramūnas</button>
+            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida')" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Ingrida</button>
+            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė')" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Aušrinė</button>
+        </div>
+
+        <div class="text-xs text-gray-400 flex items-center justify-end gap-3 border-t lg:border-t-0 pt-2 lg:pt-0">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Skubu</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Vidutinis</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Žemas</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div id="col-todo" class="kanban-col bg-gray-50 rounded-2xl p-4 border border-gray-200 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
+            <h2 class="font-bold text-gray-700 text-lg mb-4 flex items-center justify-between px-1">
+                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Naujos</span></div>
+                <span id="count-todo" class="bg-gray-200 text-gray-600 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+            </h2>
+            <div id="tasks-todo" class="space-y-3 flex-1 min-h-[300px]"></div>
+        </div>
+
+        <div id="col-progress" class="kanban-col bg-blue-50/40 rounded-2xl p-4 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
+            <h2 class="font-bold text-blue-900 text-lg mb-4 flex items-center justify-between px-1">
+                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
+                <span id="count-progress" class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+            </h2>
+            <div id="tasks-progress" class="space-y-3 flex-1 min-h-[300px]"></div>
+        </div>
+
+        <div id="col-done" class="kanban-col bg-green-50/40 rounded-2xl p-4 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
+            <h2 class="font-bold text-green-900 text-lg mb-4 flex items-center justify-between px-1">
+                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span><span>Baigtos <span class="text-xs font-normal text-gray-400">(Šią savaitę)</span></span></div>
+                <span id="count-done" class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+            </h2>
+            <div id="tasks-done" class="space-y-3 flex-1 min-h-[300px]"></div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 border border-gray-100">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-900">Sukurti naują užduotį</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <input type="hidden" id="editingId">
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Užduoties pavadinimas *</label>
+                <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-990">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Aprašymas</label>
+                <textarea id="taskDesc" rows="3" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900"></textarea>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Atsakingas asmuo</label>
+                    <select id="taskAssignee" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-gray-900">
+                        <option value="Ramūnas">Ramūnas</option>
+                        <option value="Ingrida">Ingrida</option>
+                        <option value="Aušrinė">Aušrinė</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Atlikimo terminas</label>
+                    <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Prioritetas</label>
+                    <select id="taskPriority" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-gray-900">
+                        <option value="low">Žemas</option>
+                        <option value="medium" selected>Vidutinis</option>
+                        <option value="high">Skubu</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Kategorija</label>
+                    <select id="taskCategory" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-gray-900">
+                        <option value="Užsakymai">Užsakymai</option>
+                        <option value="Gamyba / Tiekėjai">Gamyba / Tiekėjai</option>
+                        <option value="Marketingas">Marketingas</option>
+                        <option value="Kita" selected>Kita</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                <button id="deleteBtn" onclick="deleteTask()" class="text-sm text-red-500 hover:text-red-700 font-medium hidden">Ištrinti užduotį</button>
+                <div class="flex space-x-3 ml-auto">
+                    <button onclick="closeModal()" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl text-sm font-medium">Atšaukti</button>
+                    <button onclick="saveTask()" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800">Išsaugoti</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col h-[80vh]">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <h3 class="text-xl font-bold text-gray-900">Sistemos veiksmų žurnalas (Cloud)</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-2 pr-2 no-scrollbar text-sm"></div>
+            <div class="flex justify-end border-t border-gray-100 pt-4 mt-4">
+                <button onclick="closeHistoryModal()" class="px-5 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800">Uždaryti</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Tavo asmeniniai Firebase raktai iš Screenshot
+        const firebaseConfig = {
+            apiKey: "AIzaSyA9Pa3g4DGl2Ddu5F9RGjwZkPCIDovE-u4",
+            authDomain: "houmy-tasks.firebaseapp.com",
+            projectId: "houmy-tasks",
+            storageBucket: "houmy-tasks.firebasestorage.app",
+            messagingSenderId: "609731292978",
+            appId: "1:609731292978:web:f22196ebcc0f86baf4f12b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let tasks = [];
+        let historyLog = [];
+        let currentFilter = 'all';
+
+        const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
+        const categoryStyles = { 'Užsakymai': 'bg-purple-100 text-purple-800', 'Gamyba / Tiekėjai': 'bg-blue-100 text-blue-800', 'Marketingas': 'bg-pink-100 text-pink-800', 'Kita': 'bg-gray-200 text-gray-700' };
+
+        async function logAction(text) {
+            const now = new Date();
+            const timeStr = now.toLocaleDateString('lt-LT') + ' ' + now.toLocaleTimeString('lt-LT', { hour: '2-digit', minute: '2-digit' });
+            await addDoc(collection(db, "history"), { time: timeStr, text: text, timestamp: now.getTime() });
+        }
+
+        onSnapshot(collection(db, "tasks"), (snapshot) => {
+            tasks = [];
+            snapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
+            renderTasks();
+        });
+
+        onSnapshot(query(collection(db, "history"), orderBy("timestamp", "desc"), limit(150)), (snapshot) => {
+            historyLog = [];
+            snapshot.forEach((doc) => { historyLog.push(doc.data()); });
+        });
+
+        async function saveTask() {
+            const id = document.getElementById('editingId').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const desc = document.getElementById('taskDesc').value.trim();
+            const assignee = document.getElementById('taskAssignee').value;
+            const date = document.getElementById('taskDate').value;
+            const priority = document.getElementById('taskPriority').value;
+            const category = document.getElementById('taskCategory').value;
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            if (!title) { alert('Įveskite pavadinimą!'); return; }
+
+            if (id) {
+                const oldTask = tasks.find(t => t.id === id);
+                const wasTransferred = oldTask.assignee !== assignee;
+                if (wasTransferred) logAction(`Užduotis „${title}“ perleista nariui: ${assignee}`);
+                else logAction(`Atnaujinta užduotis „${title}“`);
+
+                await updateDoc(doc(db, "tasks", id), {
+                    title, desc, assignee, date, priority, category, isTransferred: wasTransferred ? true : oldTask.isTransferred
+                });
+            } else {
+                await addDoc(collection(db, "tasks"), {
+                    title, desc, assignee, date, priority, category, status: 'todo', createdAt: todayStr, isTransferred: false
+                });
+                logAction(`Sukurta užduotis: „${title}“ (Atsakingas: ${assignee})`);
+            }
+            closeModal();
+        }
+
+        async function deleteTask() {
+            const id = document.getElementById('editingId').value;
+            if (id) {
+                const task = tasks.find(t => t.id === id);
+                if (task && confirm('Ar tikrai norite ištrinti užduotį?')) {
+                    logAction(`Ištrinta užduotis: „${task.title}“`);
+                    await deleteDoc(doc(db, "tasks", id));
+                    closeModal();
+                }
+            }
+        }
+
+        async function drop(ev, newStatus) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text/plain");
+            const task = tasks.find(t => t.id === id);
+            if (task && task.status !== newStatus) {
+                const statusNames = { todo: 'Naujos', progress: 'Vykdomos', done: 'Baigtos' };
+                logAction(`Užduotis „${task.title}“ perkelta į: ${statusNames[newStatus]}`);
+                
+                const updateData = { status: newStatus };
+                if (newStatus === 'done') updateData.completedAt = new Date().toISOString().split('T')[0];
+                await updateDoc(doc(db, "tasks", id), updateData);
+            }
+        }
+
+        async function dropAssignee(ev, newAssignee) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text/plain");
+            const task = tasks.find(t => t.id === id);
+            if (task && task.assignee !== newAssignee) {
+                logAction(`Užduotis „${task.title}“ pervilkta nariui: ${newAssignee}`);
+                await updateDoc(doc(db, "tasks", id), { assignee: newAssignee, isTransferred: true });
+            }
+        }
+
+        function renderTasks() {
+            const lists = { 'todo': document.getElementById('tasks-todo'), 'progress': document.getElementById('tasks-progress'), 'done': document.getElementById('tasks-done') };
+            Object.values(lists).forEach(list => list.innerHTML = '');
+            const globalCounts = { todo: 0, progress: 0, done: 0 };
+            const searchQuery = document.getElementById('searchBar').value.toLowerCase();
+            const oneWeekAgo = new Date(); oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const priorityWeight = { high: 3, medium: 2, low: 1 };
+            const sorted = [...tasks].sort((a, b) => {
+                if (priorityWeight[b.priority] !== priorityWeight[a.priority]) return priorityWeight[b.priority] - priorityWeight[a.priority];
+                if (a.date && b.date) return new Date(a.date) - new Date(b.date);
+                return a.date ? -1 : 1;
+            });
+
+            const filtered = sorted.filter(t => (currentFilter === 'all' || t.assignee === currentFilter) && (t.title.toLowerCase().includes(searchQuery) || (t.desc && t.desc.toLowerCase().includes(searchQuery))));
+
+            filtered.forEach(task => {
+                if (task.status === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
+                globalCounts[task.status]++;
+
+                const card = document.createElement('div');
+                card.className = `task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative`;
+                card.setAttribute('draggable', 'true');
+                card.addEventListener('dragstart', (e) => drag(e, task.id));
+                card.onclick = () => openEditModal(task.id);
+                
+                const pDot = `<span class="w-3 h-3 rounded-full ${priorityDots[task.priority]}"></span>`;
+                const catBadge = task.category ? `<span class="text-[10px] px-2 py-0.5 rounded font-medium ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
+                const transferBadge = task.isTransferred ? `<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">Permesta 🔄</span>` : '';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
+                    <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
+                    ${task.desc ? `<p class="text-xs text-gray-500 mb-3 line-clamp-2">${task.desc}</p>` : ''}
+                    <div class="text-[11px] text-gray-400 mb-2.5 space-y-0.5">
+                        <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
+                        ${task.date ? `<div>🏁 Terminas: <span class="font-medium text-amber-700">${task.date}</span></div>` : ''}
+                    </div>
+                    <div class="flex justify-between items-center pt-2.5 border-t border-gray-100 mt-2">
+                        <span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-md border border-gray-200">${task.assignee}</span>
+                    </div>
+                `;
+                lists[task.status].appendChild(card);
+            });
+
+            document.getElementById('count-todo').innerText = globalCounts.todo;
+            document.getElementById('count-progress').innerText = globalCounts.progress;
+            document.getElementById('count-done').innerText = globalCounts.done;
+        }
+
+        function setFilter(member) {
+            currentFilter = member;
+            const buttons = ['all', 'Ramūnas', 'Ingrida', 'Aušrinė'];
+            buttons.forEach(b => {
+                document.getElementById(`filter-${b}`).className = b === member ? "px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent";
+            });
+            renderTasks();
+        }
+
+        window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
+        window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
+        window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
+        window.openHistoryModal = openHistoryModal; window.closeHistoryModal = closeHistoryModal;
+        window.renderTasks = renderTasks;
+    </script>
+
+    <script>
+        function closeModal() { document.getElementById('taskModal').classList.add('hidden'); }
+        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
+        function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
+        function allowDrop(ev) { ev.preventDefault(); }
+        function dragEnter(colId) { document.getElementById(colId).classList.add('drag-over'); }
+        function dragLeave(colId) { document.getElementById(colId).classList.remove('drag-over'); }
+        function dragEnterAssignee(m) { document.getElementById(`filter-${m}`).classList.add('bg-indigo-100', 'text-indigo-800'); }
+        function dragLeaveAssignee(m) { document.getElementById(`filter-${m}`).classList.remove('bg-indigo-100', 'text-indigo-800'); }
+    </script>
+</body>
+</html>
