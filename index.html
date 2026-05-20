@@ -107,7 +107,7 @@
             <input type="hidden" id="editingId">
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Užduoties pavadinimas *</label>
-                <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-990">
+                <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900">
             </div>
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Aprašymas</label>
@@ -173,7 +173,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Tavo asmeniniai Firebase raktai iš Screenshot
+        // Jūsų asmeniniai Firebase raktai
         const firebaseConfig = {
             apiKey: "AIzaSyA9Pa3g4DGl2Ddu5F9RGjwZkPCIDovE-u4",
             authDomain: "houmy-tasks.firebaseapp.com",
@@ -193,12 +193,68 @@
         const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
         const categoryStyles = { 'Užsakymai': 'bg-purple-100 text-purple-800', 'Gamyba / Tiekėjai': 'bg-blue-100 text-blue-800', 'Marketingas': 'bg-pink-100 text-pink-800', 'Kita': 'bg-gray-200 text-gray-700' };
 
+        // Modalų atidarymo / uždarymo funkcijos
+        function openCreateModal() {
+            document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
+            document.getElementById('editingId').value = '';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDesc').value = '';
+            document.getElementById('taskDate').value = '';
+            document.getElementById('taskPriority').value = 'medium';
+            document.getElementById('taskCategory').value = 'Kita';
+            document.getElementById('deleteBtn').classList.add('hidden');
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        function openEditModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            document.getElementById('modalTitle').innerText = 'Redaguoti užduotį';
+            document.getElementById('editingId').value = task.id;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDesc').value = task.desc || '';
+            document.getElementById('taskDate').value = task.date || '';
+            document.getElementById('taskPriority').value = task.priority || 'medium';
+            document.getElementById('taskCategory').value = task.category || 'Kita';
+            document.getElementById('taskAssignee').value = task.assignee || 'Ramūnas';
+            
+            document.getElementById('deleteBtn').classList.remove('hidden');
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+        }
+
+        function openHistoryModal() {
+            const listContainer = document.getElementById('historyList');
+            listContainer.innerHTML = '';
+            if (historyLog.length === 0) {
+                listContainer.innerHTML = `<div class="text-gray-400 text-center py-8">Žurnalas tuščias.</div>`;
+            } else {
+                historyLog.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'p-2.5 bg-gray-50 border border-gray-100 rounded-lg flex items-start gap-3';
+                    el.innerHTML = `<span class="text-xs font-mono bg-gray-200 text-gray-600 px-2 py-0.5 rounded shrink-0">${item.time}</span> <span class="text-gray-700">${item.text}</span>`;
+                    listContainer.appendChild(el);
+                });
+            }
+            document.getElementById('historyModal').classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.add('hidden');
+        }
+
+        // Debesų istorijos žurnalas
         async function logAction(text) {
             const now = new Date();
             const timeStr = now.toLocaleDateString('lt-LT') + ' ' + now.toLocaleTimeString('lt-LT', { hour: '2-digit', minute: '2-digit' });
             await addDoc(collection(db, "history"), { time: timeStr, text: text, timestamp: now.getTime() });
         }
 
+        // Duomenų stebėjimas realiu laiku
         onSnapshot(collection(db, "tasks"), (snapshot) => {
             tasks = [];
             snapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
@@ -252,8 +308,28 @@
             }
         }
 
+        // Tempimo (Drag & Drop) valdymas
+        function drag(ev, id) {
+            ev.dataTransfer.setData("text/plain", id);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function dragEnter(colId) {
+            document.getElementById(colId).classList.add('drag-over');
+        }
+
+        function dragLeave(colId) {
+            document.getElementById(colId).classList.remove('drag-over');
+        }
+
         async function drop(ev, newStatus) {
             ev.preventDefault();
+            const cols = ['col-todo', 'col-progress', 'col-done'];
+            cols.forEach(c => document.getElementById(c).classList.remove('drag-over'));
+            
             const id = ev.dataTransfer.getData("text/plain");
             const task = tasks.find(t => t.id === id);
             if (task && task.status !== newStatus) {
@@ -266,8 +342,19 @@
             }
         }
 
+        function dragEnterAssignee(member) {
+            document.getElementById(`filter-${member}`).classList.add('bg-indigo-100', 'text-indigo-800');
+        }
+
+        function dragLeaveAssignee(member) {
+            document.getElementById(`filter-${member}`).classList.remove('bg-indigo-100', 'text-indigo-800');
+            updateFilterButtonUI();
+        }
+
         async function dropAssignee(ev, newAssignee) {
             ev.preventDefault();
+            document.getElementById(`filter-${newAssignee}`).classList.remove('bg-indigo-100', 'text-indigo-800');
+            
             const id = ev.dataTransfer.getData("text/plain");
             const task = tasks.find(t => t.id === id);
             if (task && task.assignee !== newAssignee) {
@@ -328,29 +415,27 @@
 
         function setFilter(member) {
             currentFilter = member;
-            const buttons = ['all', 'Ramūnas', 'Ingrida', 'Aušrinė'];
-            buttons.forEach(b => {
-                document.getElementById(`filter-${b}`).className = b === member ? "px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent";
-            });
+            updateFilterButtonUI();
             renderTasks();
         }
 
+        function updateFilterButtonUI() {
+            const buttons = ['all', 'Ramūnas', 'Ingrida', 'Aušrinė'];
+            buttons.forEach(b => {
+                const btn = document.getElementById(`filter-${b}`);
+                if (btn) {
+                    btn.className = b === currentFilter ? "px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent";
+                }
+            });
+        }
+
+        // Eksponuojame funkcijas globaliam HTML naudojimui
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
         window.openHistoryModal = openHistoryModal; window.closeHistoryModal = closeHistoryModal;
-        window.renderTasks = renderTasks;
-    </script>
-
-    <script>
-        function closeModal() { document.getElementById('taskModal').classList.add('hidden'); }
-        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
-        function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
-        function allowDrop(ev) { ev.preventDefault(); }
-        function dragEnter(colId) { document.getElementById(colId).classList.add('drag-over'); }
-        function dragLeave(colId) { document.getElementById(colId).classList.remove('drag-over'); }
-        function dragEnterAssignee(m) { document.getElementById(`filter-${m}`).classList.add('bg-indigo-100', 'text-indigo-800'); }
-        function dragLeaveAssignee(m) { document.getElementById(`filter-${m}`).classList.remove('bg-indigo-100', 'text-indigo-800'); }
+        window.renderTasks = renderTasks; window.dragEnter = dragEnter; window.dragLeave = dragLeave;
+        window.dragEnterAssignee = dragEnterAssignee; window.dragLeaveAssignee = dragLeaveAssignee;
     </script>
 </body>
 </html>
