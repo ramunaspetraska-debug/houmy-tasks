@@ -260,22 +260,14 @@
             }
         }
 
-        async function forceDownload(url, filename) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = blobUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(blobUrl);
-                document.body.removeChild(a);
-            } catch (e) {
-                window.open(url, '_blank');
-            }
+        function forceDownload(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function openFilesModal() { document.getElementById('filesModal').classList.remove('hidden'); }
@@ -290,14 +282,24 @@
         }
 
         async function handleFileUpload(file, targetMember) {
-            const sender = prompt(`Kas siunčia failą „${file.name}“? \n(Įrašykite: Ramūnas, Ingrida arba Aušrinė)`, "Ramūnas");
+            // Panaudojama vietinė atmintis, kad sistema atsimintų kas paskutinį kartą siuntė failą iš šio įrenginio
+            const savedSender = localStorage.getItem('houmy_user_name') || "Ramūnas";
+            const sender = prompt(`Kas siunčia failą „${file.name}“? \n(Įrašykite: Ramūnas, Ingrida arba Aušrinė)`, savedSender);
             if (!sender) return;
+            localStorage.setItem('houmy_user_name', sender);
+            
             const targetName = targetMember === 'all' ? 'VISIEMS' : targetMember;
             logAction(`Įkeliamas failas: „${file.name}“ ➔ Kam: ${targetName}`);
 
             try {
                 const fileRef = ref(storage, `houmy_shared/${Date.now()}_${file.name}`);
-                const snapshot = await uploadBytes(fileRef, file);
+                
+                // Priverstinio atsisiuntimo meta duomenys (Atsisako atidarymo naršyklėje)
+                const metadata = {
+                    contentDisposition: `attachment; filename="${file.name}"`
+                };
+                
+                const snapshot = await uploadBytes(fileRef, file, metadata);
                 const downloadUrl = await getDownloadURL(snapshot.ref);
 
                 await addDoc(collection(db, "shared_files"), {
@@ -344,7 +346,7 @@
                             <span class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Kam: ${file.to}</span>
                         </div>
                     </div>
-                    <button onclick="forceDownload('${file.url}', '${file.name}')" class="mt-3 block w-full text-center bg-indigo-600 text-white text-[11px] font-boldDoc py-1.5 px-2 rounded-lg hover:bg-indigo-700 transition">Atsisiųsti į įrenginį 📥</button>
+                    <button onclick="forceDownload('${file.url}', '${file.name}')" class="mt-3 block w-full text-center bg-indigo-600 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg hover:bg-indigo-700 transition">Atsisiųsti į įrenginį 📥</button>
                 `;
                 container.appendChild(item);
             });
