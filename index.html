@@ -16,7 +16,7 @@
         .drag-over { background-color: #f1f0ec !important; border: 2px dashed #d1cecf; }
         .file-hover { background-color: #dcfce7 !important; border-color: #22c55e !important; transform: scale(1.03); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .task-card { cursor: grab; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-        .task-card:active { cursor: grabbing; }
+        .task-card:active { cursor: quitting; }
         .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -69,12 +69,12 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto mb-8 bg-indigo-50/40 border border-indigo-100 rounded-2xl p-4">
-        <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-3 flex flex-col sm:flex-row sm:items-center gap-2">
-            <span>📁 Greitoji failų lentyna (Brėžiniai / Nuotraukos)</span>
-            <span class="text-[10px] font-normal text-indigo-500 normal-case">(Kad pasidalintumėte, tiesiog meskite failą iš darbalaukio ant komandos nario vardo viršuje 👆)</span>
-        </h3>
-        <div id="fileShelfContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
+    <div class="max-w-6xl mx-auto mb-8 bg-indigo-50/30 border border-indigo-100/80 rounded-2xl p-3 flex items-center gap-3">
+        <input type="file" id="shelfFileInput" class="hidden" onchange="handleShelfFileSelect(this)">
+        <button onclick="document.getElementById('shelfFileInput').click()" class="w-10 h-10 bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-600 rounded-xl shadow-sm transition flex items-center justify-center text-lg shrink-0" title="Įkelti failą per kompiuterio langą">
+            📁
+        </button>
+        <div id="fileShelfContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 flex-1"></div>
     </div>
 
     <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -191,7 +191,6 @@
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // Mūsų originalus veikiantis projektas (houmy-tasks)
         const firebaseConfig = {
             apiKey: "AIzaSyA9Pa3g4DGl2Ddu5F9RGjwZkPCIDovE-u4",
             authDomain: "houmy-tasks.firebaseapp.com",
@@ -247,6 +246,14 @@
             }
         }
 
+        async function handleShelfFileSelect(input) {
+            if (input.files && input.files.length > 0) {
+                const file = input.files[0];
+                await handleFileUpload(file, 'all');
+                input.value = '';
+            }
+        }
+
         async function handleFileUpload(file, targetMember) {
             const sender = prompt(`Kas siunčia failą „${file.name}“? \n(Įrašykite: Ramūnas, Ingrida arba Aušrinė)`, "Ramūnas");
             if (!sender) return;
@@ -264,7 +271,7 @@
                 });
                 logAction(`Sėkmingai pasidalinta failu: „${file.name}“`);
             } catch (error) {
-                alert("Klaida keliant failą! Patikrinkite, ar paskelbėte Storage taisykles (Rules) po plano atnaujinimo.");
+                alert("Klaida keliant failą! Patikrinkite serverio nustatymus.");
                 console.error(error);
             }
         }
@@ -285,10 +292,8 @@
 
         function renderFileShelf() {
             const container = document.getElementById('fileShelfContainer'); container.innerHTML = '';
-            if (sharedFiles.length === 0) {
-                container.innerHTML = `<div class="text-gray-400 text-xs py-2 px-1 italic">Failų lentyna tuščia. Užmeskite failą iš kompiuterio ant viršuje esančių vardų mygtukų.</div>`;
-                return;
-            }
+            if (sharedFiles.length === 0) return; // Jei tuščia - pilna švara
+            
             sharedFiles.forEach(file => {
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded-xl border border-indigo-100 flex flex-col justify-between shadow-sm relative group';
@@ -548,7 +553,7 @@
         window.renderTasks = renderTasks; window.dragEnter = dragEnter; window.dragLeave = dragLeave;
         window.dragEnterAssignee = dragEnterAssignee; window.dragLeaveAssignee = dragLeaveAssignee;
         window.addChecklistItem = addChecklistItem; window.toggleChecklistState = toggleChecklistState; window.removeChecklistItem = removeChecklistItem;
-        window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile;
+        window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile; window.handleShelfFileSelect = handleShelfFileSelect;
     </script>
 </body>
 </html>
