@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOUMY | Užduotys V1.8</title>
+    <title>HOUMY | Užduotys V1.9</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +16,7 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         .kanban-col {
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, max-height 0.3s ease;
         }
         .drag-over {
             background-color: #f1f0ec !important;
@@ -33,6 +33,7 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         }
+        /* Slankiklių paslėpimas švariam dizainui */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -42,7 +43,7 @@
     <header class="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-6">
         <div>
             <h1 class="text-3xl font-bold tracking-wider text-gray-900">HOUMY</h1>
-            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo sistema • Versija 1.8 Pro</p>
+            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo sistema • Versija 1.9 Pro</p>
         </div>
         <div class="flex flex-wrap gap-2 w-full md:w-auto">
             <button onclick="openHistoryModal()" class="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium flex items-center justify-center gap-1">
@@ -58,48 +59,47 @@
     </header>
 
     <div class="max-w-6xl mx-auto mb-8 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-        <div class="relative flex-1 max-w-md">
+        <div class="relative flex-1 max-w-sm">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">🔍</span>
-            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none transition" placeholder="Paieška pagal pavadinimą arba aprašymą...">
+            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none transition" placeholder="Paieška...">
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
             <button onclick="setFilter('all')" id="filter-all" class="px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent">Visi</button>
             <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas')" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Ramūnas</button>
             <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida')" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Ingrida</button>
-            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė')" ondragleave="dragLeaveAssignee('Aušrinée')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Aušrinė</button>
+            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė')" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Aušrinė</button>
         </div>
 
-        <div class="text-xs text-gray-400 flex items-center justify-end gap-3 border-t lg:border-t-0 pt-2 lg:pt-0">
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Skubu</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Vidutinis</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Žemas</span>
+        <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200 self-start lg:self-auto shadow-inner">
+            <button id="view-kanban" onclick="setLayout('kanban')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">📊 Stulpeliai</button>
+            <button id="view-rows" onclick="setLayout('rows')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">☰ Juostos</button>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         <div id="col-todo" class="kanban-col bg-gray-50 rounded-2xl p-4 border border-gray-200 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
-            <h2 class="font-bold text-gray-700 text-lg mb-4 flex items-center justify-between px-1">
+            <h2 class="font-bold text-gray-700 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
                 <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Naujos</span></div>
                 <span id="count-todo" class="bg-gray-200 text-gray-600 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
             </h2>
-            <div id="tasks-todo" class="space-y-3 flex-1 min-h-[300px]"></div>
+            <div id="tasks-todo"></div>
         </div>
 
         <div id="col-progress" class="kanban-col bg-blue-50/40 rounded-2xl p-4 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
-            <h2 class="font-bold text-blue-900 text-lg mb-4 flex items-center justify-between px-1">
+            <h2 class="font-bold text-blue-900 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
                 <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
                 <span id="count-progress" class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
             </h2>
-            <div id="tasks-progress" class="space-y-3 flex-1 min-h-[300px]"></div>
+            <div id="tasks-progress"></div>
         </div>
 
         <div id="col-done" class="kanban-col bg-green-50/40 rounded-2xl p-4 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
-            <h2 class="font-bold text-green-900 text-lg mb-4 flex items-center justify-between px-1">
+            <h2 class="font-bold text-green-900 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
                 <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span><span>Baigtos <span class="text-xs font-normal text-gray-400">(Šią savaitę)</span></span></div>
                 <span id="count-done" class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
             </h2>
-            <div id="tasks-done" class="space-y-3 flex-1 min-h-[300px]"></div>
+            <div id="tasks-done"></div>
         </div>
     </div>
 
@@ -203,12 +203,49 @@
         let tasks = [];
         let historyLog = [];
         let currentFilter = 'all';
-        let currentChecklist = []; // Laikina vieta atidaryto modalo checklistui
+        let currentChecklist = [];
+        // Vietinis dizaino nustatymas (kiekviena naršyklė prisimena savo stilių)
+        let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
 
         const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
         const categoryStyles = { 'Užsakymai': 'bg-purple-100 text-purple-800', 'Gamyba / Tiekėjai': 'bg-blue-100 text-blue-800', 'Marketingas': 'bg-pink-100 text-pink-800', 'Kita': 'bg-gray-200 text-gray-700' };
 
-        // Modalų funkcijos
+        // Dizaino perjungimo funkcija
+        function setLayout(layout) {
+            currentLayout = layout;
+            localStorage.setItem('houmy_layout', layout);
+            updateLayoutUI();
+            renderTasks();
+        }
+
+        function updateLayoutUI() {
+            const boardWrapper = document.getElementById('boardWrapper');
+            const btnKanban = document.getElementById('view-kanban');
+            const btnRows = document.getElementById('view-rows');
+            const statuses = ['todo', 'progress', 'done'];
+
+            if (currentLayout === 'rows') {
+                // Konvejerio/Juostų dizainas: Pilnas plotis eilutėmis
+                boardWrapper.className = "flex flex-col gap-6 max-w-6xl mx-auto";
+                statuses.forEach(status => {
+                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col md:flex-row md:items-center gap-4`;
+                    document.getElementById(`tasks-${status}`).className = "flex flex-row gap-3 overflow-x-auto pb-2 pt-1 flex-1 no-scrollbar min-h-[160px]";
+                });
+                btnRows.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-white shadow-sm text-gray-900";
+                btnKanban.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900";
+            } else {
+                // Klasikinis Kanban stulpelių dizainas
+                boardWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto";
+                statuses.forEach(status => {
+                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col`;
+                    document.getElementById(`tasks-${status}`).className = "space-y-3 flex-1 min-h-[300px] pt-1";
+                });
+                btnKanban.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-white shadow-sm text-gray-900";
+                btnRows.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900";
+            }
+        }
+
+        // Užduočių modalų valdymas
         function openCreateModal() {
             currentChecklist = [];
             document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
@@ -242,9 +279,7 @@
             document.getElementById('taskModal').classList.remove('hidden');
         }
 
-        function closeModal() {
-            document.getElementById('taskModal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('taskModal').classList.add('hidden'); }
 
         function addChecklistItem() {
             const input = document.getElementById('newChecklistItem');
@@ -298,9 +333,7 @@
             document.getElementById('historyModal').classList.remove('hidden');
         }
 
-        function closeHistoryModal() {
-            document.getElementById('historyModal').classList.add('hidden');
-        }
+        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
 
         async function logAction(text) {
             const now = new Date();
@@ -308,6 +341,7 @@
             await addDoc(collection(db, "history"), { time: timeStr, text: text, timestamp: now.getTime() });
         }
 
+        // Stebėjimas realiu laiku
         onSnapshot(collection(db, "tasks"), (snapshot) => {
             tasks = [];
             snapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
@@ -403,8 +437,7 @@
             const globalCounts = { todo: 0, progress: 0, done: 0 };
             const searchQuery = document.getElementById('searchBar').value.toLowerCase();
             
-            const today = new Date();
-            today.setHours(0,0,0,0);
+            const today = new Date(); today.setHours(0,0,0,0);
             const oneWeekAgo = new Date(); oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
             const priorityWeight = { high: 3, medium: 2, low: 1 };
@@ -420,19 +453,18 @@
                 if (task.status === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
                 globalCounts[task.status]++;
 
-                // 2. VĖLUOJANČIŲ DARBŲ LOGIKA
+                // Vėlavimo logika
                 let dateBadgeStyle = "text-gray-600 bg-gray-100 border border-gray-200";
                 let overdueWarning = "";
                 if (task.date && task.status !== 'done') {
-                    const taskDeadline = new Date(task.date);
-                    taskDeadline.setHours(0,0,0,0);
+                    const taskDeadline = new Date(task.date); taskDeadline.setHours(0,0,0,0);
                     if (taskDeadline < today) {
                         dateBadgeStyle = "text-red-800 bg-red-100 font-bold border border-red-200 px-1.5 py-0.5 rounded animate-pulse";
                         overdueWarning = "⚠️ VĖLUOJA! ";
                     }
                 }
 
-                // 1. SUB-UŽDUOČIŲ PROGRESO SKAIČIAVIMAS KORTELĖJE
+                // Sub-užduočių progreso logika
                 let checklistHTML = "";
                 if (task.checklist && task.checklist.length > 0) {
                     const total = task.checklist.length;
@@ -453,7 +485,9 @@
                 }
 
                 const card = document.createElement('div');
-                card.className = `task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative`;
+                // 🆕 Jei esame juostų režime, uždedame fiksuotą plotį, kad kortelės nesuspaustų horizontalioje juostoje
+                const cardWidthClass = currentLayout === 'rows' ? 'w-[280px] shrink-0' : 'w-full';
+                card.className = `task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative ${cardWidthClass}`;
                 card.setAttribute('draggable', 'true');
                 card.addEventListener('dragstart', (e) => drag(e, task.id));
                 card.onclick = () => openEditModal(task.id);
@@ -466,9 +500,7 @@
                     <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
                     <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
                     ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
-                    
                     ${checklistHTML}
-
                     <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
                         <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
                         ${task.date ? `<div>🏁 Terminas: <span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span></div>` : ''}
@@ -501,7 +533,10 @@
             });
         }
 
-        // Eksponuojame funkcijas globaliam HTML naudojimui
+        // Pasileidžiant programėlei, iškart pritaikome išsaugotą dizainą
+        updateLayoutUI();
+
+        // Eksponuojame funkcijas HTML mygtukams
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
@@ -509,14 +544,7 @@
         window.renderTasks = renderTasks; window.dragEnter = dragEnter; window.dragLeave = dragLeave;
         window.dragEnterAssignee = dragEnterAssignee; window.dragLeaveAssignee = dragLeaveAssignee;
         window.addChecklistItem = addChecklistItem; window.toggleChecklistState = toggleChecklistState; window.removeChecklistItem = removeChecklistItem;
-    </script>
-
-    <script>
-        function allowDrop(ev) { ev.preventDefault(); }
-        function dragEnter(colId) { document.getElementById(colId).classList.add('drag-over'); }
-        function dragLeave(colId) { document.getElementById(colId).classList.remove('drag-over'); }
-        function dragEnterAssignee(m) { document.getElementById(`filter-${m}`).classList.add('bg-indigo-100', 'text-indigo-800'); }
-        function dragLeaveAssignee(m) { document.getElementById(`filter-${m}`).classList.remove('bg-indigo-100', 'text-indigo-800'); }
+        window.setLayout = setLayout;
     </script>
 </body>
 </html>
