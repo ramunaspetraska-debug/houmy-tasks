@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOUMY | Užduotys V1.9</title>
+    <title>HOUMY | Užduotys V2.0</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,7 +33,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         }
-        /* Slankiklių paslėpimas švariam dizainui */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -43,7 +42,7 @@
     <header class="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-6">
         <div>
             <h1 class="text-3xl font-bold tracking-wider text-gray-900">HOUMY</h1>
-            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo sistema • Versija 1.9 Pro</p>
+            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo sistema • Versija 2.0 Pro</p>
         </div>
         <div class="flex flex-wrap gap-2 w-full md:w-auto">
             <button onclick="openHistoryModal()" class="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium flex items-center justify-center gap-1">
@@ -117,6 +116,11 @@
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Aprašymas</label>
                 <textarea id="taskDesc" rows="2" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Google Drive / OneDrive failo ar aplanko nuoroda</label>
+                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Įklijuokite nukopijuotą bendrinimo nuorodą...">
             </div>
 
             <div class="mb-5 bg-gray-50 p-4 rounded-xl border border-gray-200">
@@ -204,13 +208,11 @@
         let historyLog = [];
         let currentFilter = 'all';
         let currentChecklist = [];
-        // Vietinis dizaino nustatymas (kiekviena naršyklė prisimena savo stilių)
         let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
 
         const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
         const categoryStyles = { 'Užsakymai': 'bg-purple-100 text-purple-800', 'Gamyba / Tiekėjai': 'bg-blue-100 text-blue-800', 'Marketingas': 'bg-pink-100 text-pink-800', 'Kita': 'bg-gray-200 text-gray-700' };
 
-        // Dizaino perjungimo funkcija
         function setLayout(layout) {
             currentLayout = layout;
             localStorage.setItem('houmy_layout', layout);
@@ -225,7 +227,6 @@
             const statuses = ['todo', 'progress', 'done'];
 
             if (currentLayout === 'rows') {
-                // Konvejerio/Juostų dizainas: Pilnas plotis eilutėmis
                 boardWrapper.className = "flex flex-col gap-6 max-w-6xl mx-auto";
                 statuses.forEach(status => {
                     document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col md:flex-row md:items-center gap-4`;
@@ -234,7 +235,6 @@
                 btnRows.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-white shadow-sm text-gray-900";
                 btnKanban.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900";
             } else {
-                // Klasikinis Kanban stulpelių dizainas
                 boardWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto";
                 statuses.forEach(status => {
                     document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col`;
@@ -245,13 +245,13 @@
             }
         }
 
-        // Užduočių modalų valdymas
         function openCreateModal() {
             currentChecklist = [];
             document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
             document.getElementById('editingId').value = '';
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskDesc').value = '';
+            document.getElementById('taskFileUrl').value = ''; // Išvalom
             document.getElementById('taskDate').value = '';
             document.getElementById('taskPriority').value = 'medium';
             document.getElementById('taskCategory').value = 'Kita';
@@ -269,6 +269,7 @@
             document.getElementById('editingId').value = task.id;
             document.getElementById('taskTitle').value = task.title;
             document.getElementById('taskDesc').value = task.desc || '';
+            document.getElementById('taskFileUrl').value = task.fileUrl || ''; // Užpildom
             document.getElementById('taskDate').value = task.date || '';
             document.getElementById('taskPriority').value = task.priority || 'medium';
             document.getElementById('taskCategory').value = task.category || 'Kita';
@@ -341,7 +342,6 @@
             await addDoc(collection(db, "history"), { time: timeStr, text: text, timestamp: now.getTime() });
         }
 
-        // Stebėjimas realiu laiku
         onSnapshot(collection(db, "tasks"), (snapshot) => {
             tasks = [];
             snapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
@@ -357,6 +357,7 @@
             const id = document.getElementById('editingId').value;
             const title = document.getElementById('taskTitle').value.trim();
             const desc = document.getElementById('taskDesc').value.trim();
+            const fileUrl = document.getElementById('taskFileUrl').value.trim(); // Pasiimam nuorodą
             const assignee = document.getElementById('taskAssignee').value;
             const date = document.getElementById('taskDate').value;
             const priority = document.getElementById('taskPriority').value;
@@ -372,11 +373,11 @@
                 else logAction(`Atnaujinta užduotis „${title}“`);
 
                 await updateDoc(doc(db, "tasks", id), {
-                    title, desc, assignee, date, priority, category, checklist: currentChecklist, isTransferred: wasTransferred ? true : oldTask.isTransferred
+                    title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, isTransferred: wasTransferred ? true : oldTask.isTransferred
                 });
             } else {
                 await addDoc(collection(db, "tasks"), {
-                    title, desc, assignee, date, priority, category, checklist: currentChecklist, status: 'todo', createdAt: todayStr, isTransferred: false
+                    title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, status: 'todo', createdAt: todayStr, isTransferred: false
                 });
                 logAction(`Sukurta užduotis: „${title}“ (Atsakingas: ${assignee})`);
             }
@@ -404,13 +405,11 @@
             ev.preventDefault();
             const cols = ['col-todo', 'col-progress', 'col-done'];
             cols.forEach(c => document.getElementById(c).classList.remove('drag-over'));
-            
             const id = ev.dataTransfer.getData("text/plain");
             const task = tasks.find(t => t.id === id);
             if (task && task.status !== newStatus) {
                 const statusNames = { todo: 'Naujos', progress: 'Vykdomos', done: 'Baigtos' };
                 logAction(`Užduotis „${task.title}“ perkelta į: ${statusNames[newStatus]}`);
-                
                 const updateData = { status: newStatus };
                 if (newStatus === 'done') updateData.completedAt = new Date().toISOString().split('T')[0];
                 await updateDoc(doc(db, "tasks", id), updateData);
@@ -453,7 +452,7 @@
                 if (task.status === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
                 globalCounts[task.status]++;
 
-                // Vėlavimo logika
+                // Vėlavimo stilius
                 let dateBadgeStyle = "text-gray-600 bg-gray-100 border border-gray-200";
                 let overdueWarning = "";
                 if (task.date && task.status !== 'done') {
@@ -464,13 +463,12 @@
                     }
                 }
 
-                // Sub-užduočių progreso logika
+                // Sub-užduotys
                 let checklistHTML = "";
                 if (task.checklist && task.checklist.length > 0) {
                     const total = task.checklist.length;
                     const doneCount = task.checklist.filter(item => item.done).length;
                     const pct = Math.round((doneCount / total) * 100);
-                    
                     checklistHTML = `
                         <div class="mt-3">
                             <div class="flex justify-between items-center text-[11px] font-semibold text-gray-500 mb-1">
@@ -484,8 +482,17 @@
                     `;
                 }
 
+                // 🆕 NUORODOS MYGTUKAS KORTELĖJE (Sustabdome paspaudimo sklidimą, kad neatidarytų modalo)
+                let fileButtonHTML = "";
+                if (task.fileUrl) {
+                    fileButtonHTML = `
+                        <a href="${task.fileUrl}" target="_blank" onclick="event.stopPropagation();" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2 px-3 rounded-lg hover:bg-indigo-100 transition shadow-sm">
+                            📎 Atidaryti projektą / failą
+                        </a>
+                    `;
+                }
+
                 const card = document.createElement('div');
-                // 🆕 Jei esame juostų režime, uždedame fiksuotą plotį, kad kortelės nesuspaustų horizontalioje juostoje
                 const cardWidthClass = currentLayout === 'rows' ? 'w-[280px] shrink-0' : 'w-full';
                 card.className = `task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative ${cardWidthClass}`;
                 card.setAttribute('draggable', 'true');
@@ -500,7 +507,10 @@
                     <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
                     <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
                     ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
+                    
                     ${checklistHTML}
+                    ${fileButtonHTML}
+                    
                     <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
                         <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
                         ${task.date ? `<div>🏁 Terminas: <span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span></div>` : ''}
@@ -533,10 +543,8 @@
             });
         }
 
-        // Pasileidžiant programėlei, iškart pritaikome išsaugotą dizainą
         updateLayoutUI();
 
-        // Eksponuojame funkcijas HTML mygtukams
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
