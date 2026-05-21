@@ -16,8 +16,8 @@
         .drag-over { background-color: #f1f0ec !important; border: 2px dashed #d1cecf; }
         .file-hover { background-color: #dcfce7 !important; border-color: #22c55e !important; transform: scale(1.03); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .task-card { cursor: grab; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-        .task-card:active { cursor: quitting; }
-        .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .task-card:active { cursor: grabbing; }
+        .task-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -230,8 +230,8 @@
             if (currentLayout === 'rows') {
                 boardWrapper.className = "flex flex-col gap-6 max-w-6xl mx-auto";
                 statuses.forEach(status => {
-                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col md:flex-row md:items-center gap-4`;
-                    document.getElementById(`tasks-${status}`).className = "flex flex-row gap-3 overflow-x-auto pb-2 pt-1 flex-1 no-scrollbar min-h-[160px]";
+                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col gap-3`;
+                    document.getElementById(`tasks-${status}`).className = "flex flex-col gap-2 w-full pt-1";
                 });
                 btnRows.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-white shadow-sm text-gray-900";
                 btnKanban.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900";
@@ -292,7 +292,7 @@
 
         function renderFileShelf() {
             const container = document.getElementById('fileShelfContainer'); container.innerHTML = '';
-            if (sharedFiles.length === 0) return; // Jei tuščia - pilna švara
+            if (sharedFiles.length === 0) return;
             
             sharedFiles.forEach(file => {
                 const item = document.createElement('div');
@@ -497,40 +497,67 @@
                 if (task.status === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
                 globalCounts[task.status]++;
 
-                let dateBadgeStyle = "text-gray-600 bg-gray-100 border border-gray-200"; let overdueWarning = "";
+                let dateBadgeStyle = "text-gray-600 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-xs"; let overdueWarning = "";
                 if (task.date && task.status !== 'done') {
                     const taskDeadline = new Date(task.date); taskDeadline.setHours(0,0,0,0);
-                    if (taskDeadline < today) { dateBadgeStyle = "text-red-800 bg-red-100 font-bold border border-red-200 px-1.5 py-0.5 rounded animate-pulse"; overdueWarning = "⚠️ VĖLUOJA! "; }
+                    if (taskDeadline < today) { dateBadgeStyle = "text-red-800 bg-red-100 font-bold border border-red-200 px-2 py-0.5 rounded animate-pulse text-xs"; overdueWarning = "⚠️ VĖLUOJA! "; }
                 }
 
-                let checklistHTML = "";
-                if (task.checklist && task.checklist.length > 0) {
-                    const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length; const pct = Math.round((doneCount / total) * 100);
-                    checklistHTML = `<div class="mt-3"><div class="flex justify-between items-center text-[11px] font-semibold text-gray-500 mb-1"><span>Etapai: ${doneCount}/${total}</span><span>${pct}%</span></div><div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden"><div class="bg-gray-800 h-1.5 transition-all duration-300" style="width: ${pct}%"></div></div></div>`;
-                }
-
-                let fileButtonHTML = "";
-                if (task.fileUrl) { fileButtonHTML = `<a href="${task.fileUrl}" target="_blank" onclick="event.stopPropagation();" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2 px-3 rounded-lg hover:bg-indigo-100 transition shadow-sm">Atsidaryti failą 📎</a>`;}
-
-                const card = document.createElement('div'); const cardWidthClass = currentLayout === 'rows' ? 'w-[280px] shrink-0' : 'w-full';
-                card.className = `task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative ${cardWidthClass}`;
-                card.setAttribute('draggable', 'true'); card.addEventListener('dragstart', (e) => drag(e, task.id)); card.onclick = () => openEditModal(task.id);
-                
-                const pDot = `<span class="w-3 h-3 rounded-full ${priorityDots[task.priority]}"></span>`;
+                const pDot = `<span class="w-3 h-3 rounded-full ${priorityDots[task.priority]} shrink-0"></span>`;
                 const catBadge = task.category ? `<span class="text-[10px] px-2 py-0.5 rounded font-medium ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
                 const transferBadge = task.isTransferred ? `<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">Permesta 🔄</span>` : '';
 
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
-                    <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
-                    ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
-                    ${checklistHTML} ${fileButtonHTML}
-                    <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
-                        <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
-                        ${task.date ? `<div>🏁 Terminas: <span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span></div>` : ''}
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-gray-100 mt-2"><span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-md border border-gray-200">${task.assignee}</span></div>
-                `;
+                const card = document.createElement('div');
+                card.setAttribute('draggable', 'true'); card.addEventListener('dragstart', (e) => drag(e, task.id)); card.onclick = () => openEditModal(task.id);
+
+                if (currentLayout === 'rows') {
+                    // Modernus horizontalus eilučių dizainas (Asana stiliumi)
+                    let checklistMini = "";
+                    if (task.checklist && task.checklist.length > 0) {
+                        const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length;
+                        checklistMini = `<span class="text-xs text-gray-500 font-medium whitespace-nowrap bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md">📋 ${doneCount}/${total}</span>`;
+                    }
+                    let fileIcon = task.fileUrl ? `<a href="${task.fileUrl}" target="_blank" onclick="event.stopPropagation();" class="text-indigo-700 hover:text-indigo-900 font-bold text-xs bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100 shadow-sm whitespace-nowrap">📎 Failas</a>` : '';
+
+                    card.className = "task-card bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full";
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            ${pDot}
+                            <div class="truncate">
+                                <h4 class="font-bold text-gray-900 text-sm inline mr-2">${task.title}</h4>
+                                ${task.desc ? `<span class="text-xs text-gray-500 hidden md:inline">— ${task.desc}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap justify-start sm:justify-end">
+                            ${catBadge} ${transferBadge} ${checklistMini} ${fileIcon}
+                            <div class="text-[11px] text-gray-400 min-w-[90px] text-left sm:text-right">
+                                ${task.date ? `<span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span>` : '<span class="text-gray-300">Nėra termino</span>'}
+                            </div>
+                            <span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md border border-gray-200 min-w-[75px] text-center">${task.assignee}</span>
+                        </div>
+                    `;
+                } else {
+                    // Klasikinis Kanban stulpelių (kortelių) dizainas
+                    let checklistHTML = "";
+                    if (task.checklist && task.checklist.length > 0) {
+                        const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length; const pct = Math.round((doneCount / total) * 100);
+                        checklistHTML = `<div class="mt-3"><div class="flex justify-between items-center text-[11px] font-semibold text-gray-500 mb-1"><span>Etapai: ${doneCount}/${total}</span><span>${pct}%</span></div><div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden"><div class="bg-gray-800 h-1.5 transition-all duration-300" style="width: ${pct}%"></div></div></div>`;
+                    }
+                    let fileButtonHTML = task.fileUrl ? `<a href="${task.fileUrl}" target="_blank" onclick="event.stopPropagation();" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2 px-3 rounded-lg hover:bg-indigo-100 transition shadow-sm">Atsidaryti failą 📎</a>` : '';
+
+                    card.className = "task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative w-full";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
+                        <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
+                        ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
+                        ${checklistHTML} ${fileButtonHTML}
+                        <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
+                            <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
+                            ${task.date ? `<div>🏁 Terminas: <span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span></div>` : ''}
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 mt-2"><span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-md border border-gray-200">${task.assignee}</span></div>
+                    `;
+                }
                 lists[task.status].appendChild(card);
             });
             document.getElementById('count-todo').innerText = globalCounts.todo; document.getElementById('count-progress').innerText = globalCounts.progress; document.getElementById('count-done').innerText = globalCounts.done;
