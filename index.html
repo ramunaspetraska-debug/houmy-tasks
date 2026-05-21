@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOUMY | Užduotys V2.0</title>
+    <title>HOUMY | Užduotys V2.1</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,27 +12,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #fcfbfa; /* Japandi šviesus, natūralus fonas */
+            background-color: #fcfbfa;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        .kanban-col {
-            transition: background-color 0.2s ease, max-height 0.3s ease;
-        }
-        .drag-over {
-            background-color: #f1f0ec !important;
-            border: 2px dashed #d1cecf;
-        }
-        .task-card {
-            cursor: grab;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        .task-card:active {
-            cursor: grabbing;
-        }
-        .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
+        .kanban-col { transition: background-color 0.2s ease; }
+        .drag-over { background-color: #f1f0ec !important; border: 2px dashed #d1cecf; }
+        .file-hover { background-color: #dcfce7 !important; border-color: #22c55e !important; transform: scale(1.05); shadow: lg; }
+        .task-card { cursor: grab; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .task-card:active { cursor: grabbing; }
+        .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -42,7 +30,7 @@
     <header class="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-6">
         <div>
             <h1 class="text-3xl font-bold tracking-wider text-gray-900">HOUMY</h1>
-            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo sistema • Versija 2.0 Pro</p>
+            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo ir failų sistema • Versija 2.1 Pro</p>
         </div>
         <div class="flex flex-wrap gap-2 w-full md:w-auto">
             <button onclick="openHistoryModal()" class="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium flex items-center justify-center gap-1">
@@ -57,22 +45,48 @@
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto mb-8 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-        <div class="relative flex-1 max-w-sm">
+    <div class="max-w-6xl mx-auto mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+        <div class="relative flex-1 max-w-xs">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">🔍</span>
-            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none transition" placeholder="Paieška...">
+            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white outline-none transition" placeholder="Paieška...">
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            <button onclick="setFilter('all')" id="filter-all" class="px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent">Visi</button>
-            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas')" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Ramūnas</button>
-            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida')" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Ingrida</button>
-            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė')" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent">Aušrinė</button>
+            <button id="filter-all" onclick="setFilter('all')" 
+                    ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')"
+                    class="px-4 py-2 rounded-lg text-sm font-bold transition bg-gray-900 text-white shadow-sm border border-transparent" title="Meskite failą čia, kad nusiųstumėte VISIEMS">
+                📢 VISI / Filtro išvalymas
+            </button>
+            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" 
+                    ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')"
+                    class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent" title="Meskite failą čia, kad nusiųstumėte Ramūnui">
+                👤 Ramūnas
+            </button>
+            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" 
+                    ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')"
+                    class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent" title="Meskite failą čia, kad nusiųstumėte Ingridai">
+                👤 Ingrida
+            </button>
+            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" 
+                    ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')"
+                    class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent" title="Meskite failą čia, kad nusiųstumėte Aušrinei">
+                👤 Aušrinė
+            </button>
         </div>
 
         <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200 self-start lg:self-auto shadow-inner">
             <button id="view-kanban" onclick="setLayout('kanban')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">📊 Stulpeliai</button>
             <button id="view-rows" onclick="setLayout('rows')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">☰ Juostos</button>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto mb-8 bg-indigo-50/40 border border-indigo-100 rounded-2xl p-4">
+        <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span>📁 Greitoji failų lentyna (Paskutiniai įkelti brėžiniai / nuotraukos)</span>
+            <span class="text-[10px] font-normal text-indigo-500 normal-case">(Norėdami pasidalinti, tiesiog meskite failą iš kompiuterio ant komandos nario vardo viršuje 👆)</span>
+        </h3>
+        <div id="fileShelfContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="text-gray-400 text-xs py-2 px-1 italic">Failų lentyna tuščia.</div>
         </div>
     </div>
 
@@ -117,25 +131,24 @@
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Aprašymas</label>
                 <textarea id="taskDesc" rows="2" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900"></textarea>
             </div>
-
             <div class="mb-4">
-                <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Google Drive / OneDrive failo ar aplanko nuoroda</label>
-                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Įklijuokite nukopijuotą bendrinimo nuorodą...">
+                <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Google Drive / OneDrive nuoroda (Jei pridedama rankiniu būdu)</label>
+                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none text-sm" placeholder="Nuoroda į papildomus dokumentus...">
             </div>
 
             <div class="mb-5 bg-gray-50 p-4 rounded-xl border border-gray-200">
                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Sub-užduotys / Gamybos etapai</label>
                 <div id="checklistContainer" class="space-y-2 mb-3"></div>
                 <div class="flex gap-2">
-                    <input type="text" id="newChecklistItem" class="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-gray-900" placeholder="Pvz.: Supjauti MDF plokštes...">
-                    <button onclick="addChecklistItem()" class="bg-gray-200 text-gray-800 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition">+ Pridėti</button>
+                    <input type="text" id="newChecklistItem" class="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none" placeholder="Pvz.: Paruošti specifikaciją...">
+                    <button onclick="addChecklistItem()" class="bg-gray-200 text-gray-800 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-300">+ Pridėti</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Atsakingas asmuo</label>
-                    <select id="taskAssignee" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-gray-900">
+                    <select id="taskAssignee" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none">
                         <option value="Ramūnas">Ramūnas</option>
                         <option value="Ingrida">Ingrida</option>
                         <option value="Aušrinė">Aušrinė</option>
@@ -143,13 +156,13 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Atlikimo terminas</label>
-                    <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900">
+                    <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-xl p-3 outline-none">
                 </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Prioritetas</label>
-                    <select id="taskPriority" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-gray-900">
+                    <select id="taskPriority" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none">
                         <option value="low">Žemas</option>
                         <option value="medium" selected>Vidutinis</option>
                         <option value="high">Skubu</option>
@@ -157,7 +170,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Kategorija</label>
-                    <select id="taskCategory" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-gray-900">
+                    <select id="taskCategory" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none">
                         <option value="Užsakymai">Užsakymai</option>
                         <option value="Gamyba / Tiekėjai">Gamyba / Tiekėjai</option>
                         <option value="Marketingas">Marketingas</option>
@@ -169,7 +182,7 @@
                 <button id="deleteBtn" onclick="deleteTask()" class="text-sm text-red-500 hover:text-red-700 font-medium hidden">Ištrinti užduotį</button>
                 <div class="flex space-x-3 ml-auto">
                     <button onclick="closeModal()" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl text-sm font-medium">Atšaukti</button>
-                    <button onclick="saveTask()" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800">Išsaugoti</button>
+                    <button onclick="saveTask()" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium">Išsaugoti</button>
                 </div>
             </div>
         </div>
@@ -191,6 +204,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // 🆕 Importuojame Firebase Storage ginkluotę failams įkelti
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA9Pa3g4DGl2Ddu5F9RGjwZkPCIDovE-u4",
@@ -203,9 +218,11 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Aktyvuojam Storage
 
         let tasks = [];
         let historyLog = [];
+        let sharedFiles = []; // Failų masyvas
         let currentFilter = 'all';
         let currentChecklist = [];
         let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
@@ -245,13 +262,91 @@
             }
         }
 
+        // 🆕 DRAG & DROP FAILŲ APDOROJIMO LOGIKA TIESIAI ANT VARDŲ
+        async function handleFileUpload(file, targetMember) {
+            const sender = prompt(`Kas įkelia ir siunčia failą „${file.name}“? \n(Įrašykite: Ramūnas, Ingrida arba Aušrinė)`, "Ramūnas");
+            if (!sender) return;
+
+            const targetName = targetMember === 'all' ? 'VISIEMS' : targetMember;
+            logAction(`Debesų saugyklai siunčiamas failas: „${file.name}“ (Siuntė: ${sender} ➔ Kam: ${targetName})`);
+
+            try {
+                // 1. Įkeliam į Firebase Storage
+                const fileRef = ref(storage, `houmy_shared/${Date.now()}_${file.name}`);
+                const snapshot = await uploadBytes(fileRef, file);
+                const downloadUrl = await getDownloadURL(snapshot.ref);
+
+                // 2. Registruojam įrašą Firestore duomenų bazėje lentelėje "shared_files"
+                await addDoc(collection(db, "shared_files"), {
+                    name: file.name,
+                    url: downloadUrl,
+                    storagePath: fileRef.fullPath,
+                    from: sender,
+                    to: targetName,
+                    timestamp: Date.now(),
+                    dateStr: new Date().toLocaleDateString('lt-LT') + ' ' + new Date().toLocaleTimeString('lt-LT', {hour: '2-digit', minute:'2-digit'})
+                });
+
+                logAction(`Sėkmingai pasidalinta failu: „${file.name}“`);
+            } catch (error) {
+                alert("Klaida įkeliant failą! Patikrinkite, ar Firebase Storage taisyklės (Rules) yra paskelbtos.");
+                console.error(error);
+            }
+        }
+
+        // Trinti bendrinamą failą iš lentynos
+        async function deleteSharedFile(id, storagePath, name) {
+            if (confirm(`Ar tikrai norite ištrinti failą „${name}“ iš bendros lentynos?`)) {
+                logAction(`Trinamas failas: „${name}“`);
+                try {
+                    await deleteDoc(doc(db, "shared_files", id));
+                    const fileRef = ref(storage, storagePath);
+                    await deleteObject(fileRef);
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        // Stebime failų lentyną debesyje realiu laiku
+        onSnapshot(query(collection(db, "shared_files"), orderBy("timestamp", "desc"), limit(40)), (snapshot) => {
+            sharedFiles = [];
+            snapshot.forEach((doc) => { sharedFiles.push({ id: doc.id, ...doc.data() }); });
+            renderFileShelf();
+        });
+
+        function renderFileShelf() {
+            const container = document.getElementById('fileShelfContainer');
+            container.innerHTML = '';
+            if (sharedFiles.length === 0) {
+                container.innerHTML = `<div class="text-gray-400 text-xs py-2 px-1 italic">Failų lentyna tuščia. Mesti dokumentus čia galima tiesiai ant viršuje esančių vardų mygtukų.</div>`;
+                return;
+            }
+            sharedFiles.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'bg-white p-3 rounded-xl border border-indigo-100 flex flex-col justify-between shadow-sm relative group';
+                item.innerHTML = `
+                    <button onclick="deleteSharedFile('${file.id}', '${file.storagePath}', '${file.name}')" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 font-bold text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
+                    <div>
+                        <div class="text-[10px] text-gray-400 font-mono mb-1">${file.dateStr}</div>
+                        <div class="text-xs font-bold text-gray-900 truncate pr-4" title="${file.name}">📄 ${file.name}</div>
+                        <div class="mt-2 flex flex-wrap gap-1 text-[10px]">
+                            <span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium">Nuo: ${file.from}</span>
+                            <span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Kam: ${file.to}</span>
+                        </div>
+                    </div>
+                    <a href="${file.url}" target="_blank" class="mt-3 block text-center bg-indigo-600 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg hover:bg-indigo-700 transition">Atsisiųsti / Žiūrėti</a>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Užduočių modalų valdymas
         function openCreateModal() {
             currentChecklist = [];
             document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
             document.getElementById('editingId').value = '';
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskDesc').value = '';
-            document.getElementById('taskFileUrl').value = ''; // Išvalom
+            document.getElementById('taskFileUrl').value = '';
             document.getElementById('taskDate').value = '';
             document.getElementById('taskPriority').value = 'medium';
             document.getElementById('taskCategory').value = 'Kita';
@@ -269,7 +364,7 @@
             document.getElementById('editingId').value = task.id;
             document.getElementById('taskTitle').value = task.title;
             document.getElementById('taskDesc').value = task.desc || '';
-            document.getElementById('taskFileUrl').value = task.fileUrl || ''; // Užpildom
+            document.getElementById('taskFileUrl').value = task.fileUrl || '';
             document.getElementById('taskDate').value = task.date || '';
             document.getElementById('taskPriority').value = task.priority || 'medium';
             document.getElementById('taskCategory').value = task.category || 'Kita';
@@ -357,7 +452,7 @@
             const id = document.getElementById('editingId').value;
             const title = document.getElementById('taskTitle').value.trim();
             const desc = document.getElementById('taskDesc').value.trim();
-            const fileUrl = document.getElementById('taskFileUrl').value.trim(); // Pasiimam nuorodą
+            const fileUrl = document.getElementById('taskFileUrl').value.trim();
             const assignee = document.getElementById('taskAssignee').value;
             const date = document.getElementById('taskDate').value;
             const priority = document.getElementById('taskPriority').value;
@@ -416,18 +511,40 @@
             }
         }
 
-        function dragEnterAssignee(member) { document.getElementById(`filter-${member}`).classList.add('bg-indigo-100', 'text-indigo-800'); }
-        function dragLeaveAssignee(member) { document.getElementById(`filter-${member}`).classList.remove('bg-indigo-100', 'text-indigo-800'); updateFilterButtonUI(); }
+        // Patikrinam, ar virš elemento tempiamas kompiuterio failas, ar sistemos kortelė
+        function isFileDrag(ev) { return ev.dataTransfer.types.includes('Files'); }
+
+        function dragEnterAssignee(member, ev) { 
+            const btn = document.getElementById(`filter-${member}`);
+            if (isFileDrag(ev)) { btn.classList.add('file-hover'); } 
+            else { btn.classList.add('bg-indigo-100', 'text-indigo-800'); }
+        }
+        function dragLeaveAssignee(member) { 
+            const btn = document.getElementById(`filter-${member}`);
+            btn.classList.remove('bg-indigo-100', 'text-indigo-800', 'file-hover'); 
+            updateFilterButtonUI(); 
+        }
 
         async function dropAssignee(ev, newAssignee) {
             ev.preventDefault();
-            document.getElementById(`filter-${newAssignee}`).classList.remove('bg-indigo-100', 'text-indigo-800');
+            const btn = document.getElementById(`filter-${newAssignee}`);
+            btn.classList.remove('bg-indigo-100', 'text-indigo-800', 'file-hover');
+            
+            // 🆕 JEI NUMETAMAS TIKRAS FAILAS IŠ KOMPIUTERIO DISKO
+            if (ev.dataTransfer.files && ev.dataTransfer.files.length > 0) {
+                const file = ev.dataTransfer.files[0];
+                await handleFileUpload(file, newAssignee);
+                updateFilterButtonUI();
+                return;
+            }
+
+            // JEI NUMETAMA SISTEMOS KORTELĖ (Užduoties perleidimas)
             const id = ev.dataTransfer.getData("text/plain");
             const task = tasks.find(t => t.id === id);
-            if (task && task.assignee !== newAssignee) {
+            if (task && newAssignee !== 'all' && task.assignee !== newAssignee) {
                 logAction(`Užduotis „${task.title}“ pervilkta nariui: ${newAssignee}`);
                 await updateDoc(doc(db, "tasks", id), { assignee: newAssignee, isTransferred: true });
-            }
+            } else { updateFilterButtonUI(); }
         }
 
         function renderTasks() {
@@ -452,7 +569,6 @@
                 if (task.status === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
                 globalCounts[task.status]++;
 
-                // Vėlavimo stilius
                 let dateBadgeStyle = "text-gray-600 bg-gray-100 border border-gray-200";
                 let overdueWarning = "";
                 if (task.date && task.status !== 'done') {
@@ -463,7 +579,6 @@
                     }
                 }
 
-                // Sub-užduotys
                 let checklistHTML = "";
                 if (task.checklist && task.checklist.length > 0) {
                     const total = task.checklist.length;
@@ -482,7 +597,6 @@
                     `;
                 }
 
-                // 🆕 NUORODOS MYGTUKAS KORTELĖJE (Sustabdome paspaudimo sklidimą, kad neatidarytų modalo)
                 let fileButtonHTML = "";
                 if (task.fileUrl) {
                     fileButtonHTML = `
@@ -507,10 +621,8 @@
                     <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
                     <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
                     ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
-                    
                     ${checklistHTML}
                     ${fileButtonHTML}
-                    
                     <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
                         <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
                         ${task.date ? `<div>🏁 Terminas: <span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span></div>` : ''}
@@ -538,7 +650,11 @@
             buttons.forEach(b => {
                 const btn = document.getElementById(`filter-${b}`);
                 if (btn) {
-                    btn.className = b === currentFilter ? "px-4 py-1.5 rounded-lg text-sm font-medium transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-4 py-1.5 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100 border border-transparent";
+                    if (b === currentFilter) {
+                        btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition bg-gray-900 text-white shadow-sm border border-transparent";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent";
+                    }
                 }
             });
         }
@@ -552,7 +668,7 @@
         window.renderTasks = renderTasks; window.dragEnter = dragEnter; window.dragLeave = dragLeave;
         window.dragEnterAssignee = dragEnterAssignee; window.dragLeaveAssignee = dragLeaveAssignee;
         window.addChecklistItem = addChecklistItem; window.toggleChecklistState = toggleChecklistState; window.removeChecklistItem = removeChecklistItem;
-        window.setLayout = setLayout;
+        window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile;
     </script>
 </body>
 </html>
