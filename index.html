@@ -52,16 +52,16 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            <button id="filter-all" onclick="setFilter('all')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')" class="px-4 py-2 rounded-lg text-sm font-bold transition bg-gray-900 text-white shadow-sm border border-transparent" title="Meskite failą čia, kad nusiųstumėte VISIEMS">
+            <button id="filter-all" onclick="setFilter('all')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')" class="px-4 py-2 rounded-lg text-sm font-bold transition bg-gray-900 text-white shadow-sm border border-transparent">
                 👥 VISI
             </button>
-            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent" title="Meskite failą čia, kad nusiųstumėte Ramūnui">
+            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
                 👤 Ramūnas
             </button>
-            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent" title="Meskite failą čia, kad nusiųstumėte Ingridai">
+            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
                 👤 Ingrida
             </button>
-            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent" title="Meskite failą čia, kad nusiųstumėte Aušrinei">
+            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
                 👤 Aušrinė
             </button>
         </div>
@@ -69,30 +69,6 @@
         <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200 shadow-inner">
             <button id="view-kanban" onclick="setLayout('kanban')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">📊 Stulpeliai</button>
             <button id="view-rows" onclick="setLayout('rows')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">☰ Juostos</button>
-        </div>
-    </div>
-
-    <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        <div id="col-todo" class="kanban-col bg-gray-50 rounded-2xl p-4 border border-gray-200 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
-            <h2 class="font-bold text-gray-700 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Naujos</span></div>
-                <span id="count-todo" class="bg-gray-200 text-gray-600 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
-            </h2>
-            <div id="tasks-todo"></div>
-        </div>
-        <div id="col-progress" class="kanban-col bg-blue-50/40 rounded-2xl p-4 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
-            <h2 class="font-bold text-blue-900 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
-                <span id="count-progress" class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
-            </h2>
-            <div id="tasks-progress"></div>
-        </div>
-        <div id="col-done" class="kanban-col bg-green-50/40 rounded-2xl p-4 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
-            <h2 class="font-bold text-green-900 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span><span>Baigtos <span class="text-xs font-normal text-gray-400">(Šią savaitę)</span></span></div>
-                <span id="count-done" class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
-            </h2>
-            <div id="tasks-done"></div>
         </div>
     </div>
 
@@ -133,6 +109,15 @@
             <div class="mb-4">
                 <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Google Drive nuoroda (Papildomai)</label>
                 <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none text-sm" placeholder="Nuoroda į papildomus dokumentus...">
+            </div>
+
+            <div class="mb-5 bg-amber-50/40 p-4 rounded-xl border border-amber-200/60">
+                <label class="block text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">📝 Darbo eigos užrašai / Komentarai</label>
+                <div id="commentsContainer" class="space-y-2 mb-3 max-h-36 overflow-y-auto no-scrollbar text-xs"></div>
+                <div class="flex gap-2">
+                    <input type="text" id="newCommentText" class="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none bg-white focus:border-amber-400" placeholder="Įrašykite naują situaciją ar info...">
+                    <button onclick="addCommentItem()" class="bg-gray-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-800 transition">Pridėti</button>
+                </div>
             </div>
 
             <div class="mb-5 bg-gray-50 p-4 rounded-xl border border-gray-200">
@@ -223,6 +208,7 @@
         let sharedFiles = [];
         let currentFilter = 'all';
         let currentChecklist = [];
+        let currentComments = []; // Komentarų būsena modale
         let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
 
         const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
@@ -282,7 +268,6 @@
         }
 
         async function handleFileUpload(file, targetMember) {
-            // Panaudojama vietinė atmintis, kad sistema atsimintų kas paskutinį kartą siuntė failą iš šio įrenginio
             const savedSender = localStorage.getItem('houmy_user_name') || "Ramūnas";
             const sender = prompt(`Kas siunčia failą „${file.name}“? \n(Įrašykite: Ramūnas, Ingrida arba Aušrinė)`, savedSender);
             if (!sender) return;
@@ -293,11 +278,7 @@
 
             try {
                 const fileRef = ref(storage, `houmy_shared/${Date.now()}_${file.name}`);
-                
-                // Priverstinio atsisiuntimo meta duomenys (Atsisako atidarymo naršyklėje)
-                const metadata = {
-                    contentDisposition: `attachment; filename="${file.name}"`
-                };
+                const metadata = { contentDisposition: `attachment; filename="${file.name}"` };
                 
                 const snapshot = await uploadBytes(fileRef, file, metadata);
                 const downloadUrl = await getDownloadURL(snapshot.ref);
@@ -354,6 +335,7 @@
 
         function openCreateModal() {
             currentChecklist = [];
+            currentComments = [];
             document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
             document.getElementById('editingId').value = '';
             document.getElementById('taskTitle').value = '';
@@ -364,6 +346,7 @@
             document.getElementById('taskCategory').value = 'Kita';
             document.getElementById('deleteBtn').classList.add('hidden');
             renderChecklistDOM();
+            renderCommentsDOM();
             document.getElementById('taskModal').classList.remove('hidden');
         }
 
@@ -371,6 +354,7 @@
             const task = tasks.find(t => t.id === id);
             if (!task) return;
             currentChecklist = task.checklist || [];
+            currentComments = task.comments || [];
             document.getElementById('modalTitle').innerText = 'Redaguoti užduotį';
             document.getElementById('editingId').value = task.id;
             document.getElementById('taskTitle').value = task.title;
@@ -382,10 +366,12 @@
             document.getElementById('taskAssignee').value = task.assignee || 'Ramūnas';
             document.getElementById('deleteBtn').classList.remove('hidden');
             renderChecklistDOM();
+            renderCommentsDOM();
             document.getElementById('taskModal').classList.remove('hidden');
         }
 
         function closeModal() { document.getElementById('taskModal').classList.add('hidden'); }
+        
         function addChecklistItem() {
             const input = document.getElementById('newChecklistItem');
             const text = input.value.trim(); if (!text) return;
@@ -408,6 +394,41 @@
                 `;
                 container.appendChild(div);
             });
+        }
+
+        // 📝 LOGIKA: KOMENTARŲ PRIDĖJIMAS IR ATSKAIČIAVIMAS DOM
+        function addCommentItem() {
+            const input = document.getElementById('newCommentText');
+            const text = input.value.trim(); if (!text) return;
+            const author = localStorage.getItem('houmy_user_name') || "Ramūnas";
+            
+            const now = new Date();
+            const timeStr = now.toLocaleDateString('lt-LT', {month: '2-digit', day: '2-digit'}) + ' ' + now.toLocaleTimeString('lt-LT', {hour: '2-digit', minute: '2-digit'});
+            
+            currentComments.push({ text, author, time: timeStr });
+            input.value = ''; 
+            renderCommentsDOM();
+        }
+
+        function renderCommentsDOM() {
+            const container = document.getElementById('commentsContainer'); container.innerHTML = '';
+            if (currentComments.length === 0) {
+                container.innerHTML = `<div class="text-gray-400 italic py-1">Užrašų ar situacijų atnaujinimų dar nėra.</div>`;
+                return;
+            }
+            currentComments.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-2 border border-amber-100 rounded-lg shadow-inner';
+                div.innerHTML = `
+                    <div class="flex justify-between text-[10px] text-gray-400 font-medium mb-0.5">
+                        <span class="text-amber-800 font-bold">👤 ${item.author}</span>
+                        <span>${item.time}</span>
+                    </div>
+                    <div class="text-gray-700 text-xs">${item.text}</div>
+                `;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
         }
 
         function openHistoryModal() {
@@ -453,10 +474,19 @@
                 const oldTask = tasks.find(t => t.id === id);
                 const wasTransferred = oldTask.assignee !== assignee;
                 if (wasTransferred) logAction(`Užduotis „${title}“ perleista nariui: ${assignee}`);
-                else logAction(`Atnaujinta užduotis „${title}“`);
-                await updateDoc(doc(db, "tasks", id), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, isTransferred: wasTransferred ? true : oldTask.isTransferred });
+                
+                // Patikrinam ar atsirado naujas komentaras lyginant su senu skaičiumi
+                const oldCommentsLength = oldTask.comments ? oldTask.comments.length : 0;
+                if (currentComments.length > oldCommentsLength) {
+                    const lastComment = currentComments[currentComments.length - 1];
+                    logAction(`Užduotyje „${title}“ ${lastComment.author} pridėjo info: "${lastComment.text}"`);
+                } else {
+                    if (!wasTransferred) logAction(`Atnaujinta užduotis „${title}“`);
+                }
+
+                await updateDoc(doc(db, "tasks", id), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, comments: currentComments, isTransferred: wasTransferred ? true : oldTask.isTransferred });
             } else {
-                await addDoc(collection(db, "tasks"), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, status: 'todo', createdAt: todayStr, isTransferred: false });
+                await addDoc(collection(db, "tasks"), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, comments: currentComments, status: 'todo', createdAt: todayStr, isTransferred: false });
                 logAction(`Sukurta užduotis: „${title}“ (Atsakingas: ${assignee})`);
             }
             closeModal();
@@ -546,6 +576,15 @@
                 const catBadge = task.category ? `<span class="text-[10px] px-2 py-0.5 rounded font-medium ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
                 const transferBadge = task.isTransferred ? `<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">Permesta 🔄</span>` : '';
 
+                // 📝 VIZUALUS INTEGRALAS: PASKUTINIO KOMENTARO ATVAZDAVIMAS LENTOJE
+                let commentBadgeHTML = "";
+                if (task.comments && task.comments.length > 0) {
+                    const lastComment = task.comments[task.comments.length - 1];
+                    commentBadgeHTML = `<div class="mt-2 text-xs bg-amber-50/70 border border-amber-200/50 p-2 rounded-lg text-gray-700 line-clamp-2 shadow-sm" title="${lastComment.author}: ${lastComment.text}">
+                        <span class="font-bold text-amber-900">📝 ${lastComment.author}:</span> ${lastComment.text}
+                    </div>`;
+                }
+
                 const card = document.createElement('div');
                 card.setAttribute('draggable', 'true'); card.addEventListener('dragstart', (e) => drag(e, task.id)); card.onclick = () => openEditModal(task.id);
 
@@ -559,11 +598,13 @@
 
                     card.className = "task-card bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full";
                     card.innerHTML = `
-                        <div class="flex items-center gap-3 flex-1 min-w-0">
-                            ${pDot}
-                            <div class="truncate">
-                                <h4 class="font-bold text-gray-900 text-sm inline mr-2">${task.title}</h4>
-                                ${task.desc ? `<span class="text-xs text-gray-500 hidden md:inline">— ${task.desc}</span>` : ''}
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 flex-1 min-w-0">
+                            <div class="flex items-center gap-3">
+                                ${pDot}
+                                <h4 class="font-bold text-gray-900 text-sm truncate">${task.title}</h4>
+                            </div>
+                            <div class="flex-1 min-w-0 md:max-w-md">
+                                ${commentBadgeHTML ? commentBadgeHTML : task.desc ? `<span class="text-xs text-gray-400 truncate block">— ${task.desc}</span>` : ''}
                             </div>
                         </div>
                         <div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap justify-start sm:justify-end">
@@ -587,6 +628,9 @@
                         <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
                         <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
                         ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
+                        
+                        ${commentBadgeHTML}
+                        
                         ${checklistHTML} ${fileButtonHTML}
                         <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
                             <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
@@ -619,6 +663,7 @@
         window.dragEnterAssignee = dragEnterAssignee; window.dragLeaveAssignee = dragLeaveAssignee;
         window.addChecklistItem = addChecklistItem; window.toggleChecklistState = toggleChecklistState; window.removeChecklistItem = removeChecklistItem;
         window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile; window.handleShelfFileSelect = handleShelfFileSelect; window.forceDownload = forceDownload;
+        window.addCommentItem = addCommentItem;
     </script>
 </body>
 </html>
