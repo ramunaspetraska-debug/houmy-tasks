@@ -131,8 +131,8 @@
                 <textarea id="taskDesc" rows="2" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900"></textarea>
             </div>
             <div class="mb-4">
-                <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Google Drive nuoroda (Papildomai)</label>
-                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none text-sm" placeholder="Nuoroda į papildomus dokumentus...">
+                <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Susijusi nuoroda (Gmail, Google Drive, Svetainė...)</label>
+                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none text-sm" placeholder="Įklijuokite Gmail laiško, Drive ar bet kokią internetinę nuorodą...">
             </div>
 
             <div class="mb-5 bg-amber-50/40 p-4 rounded-xl border border-amber-200/60">
@@ -606,6 +606,20 @@
                     </div>`;
                 }
 
+                // 🧠 SUTVARKYTA LOGIKA: Automatinis nuorodos tipo atpažinimas pagal adresą
+                let linkLabel = "🔗 Nuoroda";
+                let linkStyle = "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100";
+                
+                if (task.fileUrl) {
+                    if (task.fileUrl.includes("mail.google.com")) {
+                        linkLabel = "📧 Gmail laiškas";
+                        linkStyle = "bg-red-50 border-red-200 text-red-700 hover:bg-red-100";
+                    } else if (task.fileUrl.includes("drive.google.com") || task.fileUrl.includes("docs.google.com")) {
+                        linkLabel = "📁 Drive failas";
+                        linkStyle = "bg-green-50 border-green-200 text-green-700 hover:bg-green-100";
+                    }
+                }
+
                 const card = document.createElement('div');
                 card.setAttribute('draggable', 'true'); card.addEventListener('dragstart', (e) => drag(e, task.id)); card.onclick = () => openEditModal(task.id);
 
@@ -615,7 +629,7 @@
                         const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length;
                         checklistMini = `<span class="text-xs text-gray-500 font-medium whitespace-nowrap bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md">📋 ${doneCount}/${total}</span>`;
                     }
-                    let fileIcon = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'uzduoties_failas')" class="text-indigo-700 hover:text-indigo-900 font-bold text-xs bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100 shadow-sm whitespace-nowrap">📎 Failas</button>` : '';
+                    let fileIcon = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="${linkStyle} font-bold text-xs px-2.5 py-0.5 rounded-md border shadow-sm whitespace-nowrap transition">${linkLabel}</button>` : '';
 
                     card.className = "task-card bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full";
                     card.innerHTML = `
@@ -637,13 +651,12 @@
                         </div>
                     `;
                 } else {
-                    // SUTVARKYTA: Atkurta checklistHTML kintamojo logika klasikiniam Kanban dizainui
                     let checklistHTML = "";
                     if (task.checklist && task.checklist.length > 0) {
                         const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length; const pct = Math.round((doneCount / total) * 100);
                         checklistHTML = `<div class="mt-3"><div class="flex justify-between items-center text-[11px] font-semibold text-gray-500 mb-1"><span>Etapai: ${doneCount}/${total}</span><span>${pct}%</span></div><div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden"><div class="bg-gray-800 h-1.5 transition-all duration-300" style="width: ${pct}%"></div></div></div>`;
                     }
-                    let fileButtonHTML = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'uzduoties_failas')" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2 px-3 rounded-lg hover:bg-indigo-100 transition shadow-sm">Atsisiųsti failą 📥</button>` : '';
+                    let fileButtonHTML = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full ${linkStyle} border text-xs font-bold py-2 px-3 rounded-lg transition shadow-sm">${linkLabel}</button>` : '';
 
                     card.className = "task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative w-full";
                     card.innerHTML = `
