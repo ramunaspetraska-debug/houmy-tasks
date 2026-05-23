@@ -94,8 +94,8 @@
     </div>
 
     <div id="filesModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 flex flex-col h-[70vh]">
-            <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 flex flex-col h-[75vh]">
+            <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-2 shrink-0">
                 <div class="flex items-center gap-3">
                     <h3 class="text-sm font-bold text-gray-900">📁 Bendrinami gamybos failai</h3>
                     <input type="file" id="shelfFileInput" class="hidden" onchange="handleShelfFileSelect(this)">
@@ -105,8 +105,19 @@
                 </div>
                 <button onclick="closeFilesModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
+            
+            <div class="mb-3 bg-gray-50 border border-gray-200/80 p-2 rounded-lg shrink-0">
+                <div class="flex justify-between font-semibold text-[10px] text-gray-500 mb-1">
+                    <span id="storageText">Skaičiuojama vietos talpa...</span>
+                    <span id="storagePct">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                    <div id="storageBar" class="bg-indigo-600 h-1.5 transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
             <div id="fileShelfContainer" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1 no-scrollbar"></div>
-            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3">
+            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3 shrink-0">
                 <button onclick="closeFilesModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-xl text-xs font-bold">Uždaryti</button>
             </div>
         </div>
@@ -202,11 +213,10 @@
             <div class="flex justify-between items-center border-t border-gray-100 pt-2.5 shrink-0 mt-2">
                 <button id="deleteBtn" onclick="deleteTask()" class="text-xs text-red-500 hover:text-red-700 font-bold hidden">Ištrinti</button>
                 <div class="flex space-x-2 ml-auto">
-                    <button onclick="closeModal()" class="px-4 py-1.5 text-gray-500 hover:bg-gray-100 rounded-lg font-medium">Atšaukti</button>
+                    <button onclick="closeModal()" class="px-4 py-1.5 text-gray-500 hover:bg-gray-100 rounded-xl font-medium">Atšaukti</button>
                     <button onclick="saveTask()" class="px-5 py-1.5 bg-gray-900 text-white rounded-lg font-bold shadow-sm hover:bg-gray-800">Išsaugoti</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -217,8 +227,8 @@
                 <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
             <div id="historyList" class="flex-1 overflow-y-auto space-y-1.5 pr-1 no-scrollbar text-[11px]"></div>
-            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3">
-                <button onclick="closeHistoryModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-lg font-bold">Uždaryti</button>
+            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3 shrink-0">
+                <button onclick="closeHistoryModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-xl text-xs font-bold">Uždaryti</button>
             </div>
         </div>
     </div>
@@ -248,11 +258,10 @@
         let currentChecklist = [];
         let currentComments = []; 
         let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
+        
+        let totalStorageSize = 0;
+        const MAX_STORAGE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB Limit
 
-        const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
-        const categoryStyles = { 'Užsakymai': 'bg-purple-50 text-purple-700', 'Gamyba / Tiekėjai': 'bg-blue-50 text-blue-700', 'Marketingas': 'bg-pink-50 text-pink-700', 'Kita': 'bg-gray-100 text-gray-600' };
-
-        // 1. JUNGIMO/RODYMO PAPILDOMŲ LAUKŲ FUNKCIJA
         function toggleAdvancedFields() {
             const checkbox = document.getElementById('toggleAdvanced');
             const target = document.getElementById('advancedFields');
@@ -319,7 +328,13 @@
             }
         }
 
+        // 🛡️ SUTVARKUOTA APSAUGA (TIK SU 5 GB LIMITU)
         async function handleFileUpload(file, targetMember) {
+            if (totalStorageSize + file.size > MAX_STORAGE_BYTES) {
+                alert(`🚨 BLOKUOJAMA: Failas netelpa! Nemokama 5.0 GB saugyklos talpa bus pilnai viršyta. Ištrinkite senus brėžinius/failus iš Failinės.`);
+                return;
+            }
+
             const savedSender = localStorage.getItem('houmy_user_name') || "Ramūnas";
             const sender = prompt(`Kas siunčia failą „${file.name}“?`, savedSender);
             if (!sender) return;
@@ -337,6 +352,7 @@
 
                 await addDoc(collection(db, "shared_files"), {
                     name: file.name, url: downloadUrl, storagePath: fileRef.fullPath, from: sender, to: targetName, timestamp: Date.now(),
+                    size: file.size, 
                     dateStr: new Date().toLocaleDateString('lt-LT') + ' ' + new Date().toLocaleTimeString('lt-LT', {hour: '2-digit', minute:'2-digit'})
                 });
                 logAction(`Įkeltas failas: „${file.name}“`);
@@ -344,6 +360,24 @@
                 alert("Klaida keliant failą!");
                 console.error(error);
             }
+        }
+
+        function updateStorageBarUI() {
+            const txt = document.getElementById('storageText');
+            const bar = document.getElementById('storageBar');
+            const pctText = document.getElementById('storagePct');
+            if (!txt || !bar || !pctText) return;
+
+            const usedMB = (totalStorageSize / (1024 * 1024)).toFixed(1);
+            const pct = Math.min(((totalStorageSize / MAX_STORAGE_BYTES) * 100), 100).toFixed(1);
+
+            txt.innerText = `Saugykla: ${usedMB} MB / 5.0 GB`;
+            pctText.innerText = `${pct}%`;
+            bar.style.width = `${pct}%`;
+
+            if (pct > 90) bar.className = "bg-red-600 h-1.5 transition-all duration-300";
+            else if (pct > 70) bar.className = "bg-amber-500 h-1.5 transition-all duration-300";
+            else bar.className = "bg-indigo-600 h-1.5 transition-all duration-300";
         }
 
         async function deleteSharedFile(id, storagePath, name) {
@@ -366,10 +400,12 @@
             sharedFiles.forEach(file => {
                 const item = document.createElement('div');
                 item.className = 'bg-gray-50 p-2 rounded-lg border border-gray-200 flex flex-col justify-between relative group';
+                const fSize = file.size ? (file.size / (1024 * 1024)).toFixed(2) + ' MB' : '—';
+                
                 item.innerHTML = `
                     <button onclick="deleteSharedFile('${file.id}', '${file.storagePath}', '${file.name}')" class="absolute top-1 right-1.5 text-gray-300 hover:text-red-500 font-bold text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
                     <div>
-                        <div class="text-[9px] text-gray-400 font-mono mb-0.5">${file.dateStr}</div>
+                        <div class="text-[9px] text-gray-400 font-mono mb-0.5">${file.dateStr} <span class="ml-1 text-gray-400/80">(${fSize})</span></div>
                         <div class="text-[11px] font-bold text-gray-900 truncate pr-3" title="${file.name}">📄 ${file.name}</div>
                         <div class="mt-1 flex gap-1 text-[9px]">
                             <span class="text-gray-500">Nuo: ${file.from}</span>
@@ -394,7 +430,6 @@
             document.getElementById('taskCategory').value = 'Kita';
             document.getElementById('deleteBtn').classList.add('hidden');
             
-            // Atstatome paslėptus laukus į numatytą būseną (paslėpta)
             const checkbox = document.getElementById('toggleAdvanced');
             if (checkbox) checkbox.checked = false;
             toggleAdvancedFields();
@@ -418,7 +453,6 @@
             document.getElementById('taskAssignee').value = task.assignee || 'Ramūnas';
             document.getElementById('deleteBtn').classList.remove('hidden');
             
-            // Išmanioji logika: Jei užduotis jau turi papildomų duomenų (pvz nuorodą), automatiškai išskleidžiame advanced laukus
             const checkbox = document.getElementById('toggleAdvanced');
             if (checkbox) {
                 if (task.fileUrl || (task.priority && task.priority !== 'medium') || (task.category && task.category !== 'Kita')) {
@@ -651,7 +685,7 @@
             buttons.forEach(b => { const btn = document.getElementById(`filter-${b}`); if (btn) btn.className = b === currentFilter ? "px-3 py-1.5 rounded-lg font-bold transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-3 py-1.5 rounded-lg font-bold transition text-gray-500 hover:bg-gray-100 border border-transparent"; });
         }
 
-        // 🚀 2. REZERVAVIMAS WINDOW OBJEKTE (VYKDOMAS PIRMIAUSIA)
+        // 🚀 2. REZERVAVIMAS WINDOW OBJEKTE
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
@@ -667,9 +701,20 @@
         try { updateLayoutUI(); } catch (e) { console.error(e); }
 
         try {
-            onSnapshot(query(collection(db, "shared_files"), orderBy("timestamp", "desc"), limit(40)), (snapshot) => {
-                sharedFiles = []; snapshot.forEach((doc) => { sharedFiles.push({ id: doc.id, ...doc.data() }); });
-                try { renderFileShelf(); } catch(err) { console.error(err); }
+            onSnapshot(query(collection(db, "shared_files"), orderBy("timestamp", "desc"), limit(100)), (snapshot) => {
+                sharedFiles = [];
+                totalStorageSize = 0; 
+                
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    sharedFiles.push({ id: doc.id, ...data });
+                    if (data.size) totalStorageSize += data.size; 
+                });
+                
+                try { 
+                    renderFileShelf(); 
+                    updateStorageBarUI(); 
+                } catch(err) { console.error(err); }
             });
             onSnapshot(collection(db, "tasks"), (snapshot) => {
                 tasks = []; snapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
