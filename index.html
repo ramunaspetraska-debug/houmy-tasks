@@ -461,7 +461,7 @@
         function openHistoryModal() {
             const listContainer = document.getElementById('historyList'); if (!listContainer) return;
             listContainer.innerHTML = '';
-            if (historyLog.length === 0) { listContainer.innerHTML = `<div class="text-gray-400 text-center py-2">Tuščia.</div>`; } 
+            if (historyLog.length === 0) { listContainer.innerHTML = `<div class="text-gray-400 text-center py-4">Tuščia.</div>`; } 
             else {
                 historyLog.forEach(item => {
                     const el = document.createElement('div'); el.className = 'p-1 bg-gray-50 border border-gray-100 rounded flex gap-2 items-baseline';
@@ -530,6 +530,10 @@
         }
 
         function renderTasks() {
+            // 🛠️ FIX: priorityDots ir categoryStyles įrašyti tiesiai viduje klaidų prevencijai
+            const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
+            const categoryStyles = { 'Užsakymai': 'bg-purple-50 text-purple-700', 'Gamyba / Tiekėjai': 'bg-blue-50 text-blue-700', 'Marketingas': 'bg-pink-50 text-pink-700', 'Kita': 'bg-gray-100 text-gray-600' };
+
             const lists = { 'todo': document.getElementById('tasks-todo'), 'progress': document.getElementById('tasks-progress'), 'done': document.getElementById('tasks-done') };
             Object.values(lists).forEach(list => { if (list) list.innerHTML = ''; }); const globalCounts = { todo: 0, progress: 0, done: 0 };
             const searchBarEl = document.getElementById('searchBar'); const searchQuery = searchBarEl ? searchBarEl.value.toLowerCase() : '';
@@ -620,6 +624,7 @@
             buttons.forEach(b => { const btn = document.getElementById(`filter-${b}`); if (btn) btn.className = b === currentFilter ? "px-2.5 py-1 rounded-md font-bold transition bg-gray-900 text-white shadow-sm" : "px-2.5 py-1 rounded-md font-bold transition text-gray-400 hover:bg-gray-50"; });
         }
 
+        // 🚀 2. REZERVAVIMAS WINDOW OBJEKTE
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
@@ -631,6 +636,7 @@
         window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile; window.handleShelfFileSelect = handleShelfFileSelect;
         window.forceDownload = forceDownload; window.addCommentItem = addCommentItem; window.toggleAdvancedFields = toggleAdvancedFields;
 
+        // 🛡️ 3. SAUGUS DUOMENŲ PALEIDIMAS
         try { updateLayoutUI(); } catch (e) { console.error(e); }
         try {
             onSnapshot(query(collection(db, "shared_files"), orderBy("timestamp", "desc"), limit(100)), (snapshot) => {
