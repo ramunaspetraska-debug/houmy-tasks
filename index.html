@@ -11,174 +11,171 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #fcfbfa; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        .kanban-col { transition: background-color 0.2s ease; }
-        .drag-over { background-color: #f1f0ec !important; border: 2px dashed #d1cecf; }
-        .file-hover { background-color: #dcfce7 !important; border-color: #22c55e !important; transform: scale(1.03); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .task-card { cursor: grab; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        body { background-color: #faf9f6; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .kanban-col { transition: background-color 0.15s ease; }
+        .drag-over { background-color: #f3f1eb !important; border-color: #b8b4b2 !important; }
+        .file-hover { background-color: #f0fdf4 !important; border-color: #22c55e !important; transform: scale(1.01); }
+        .task-card { cursor: grab; transition: transform 0.1s ease, box-shadow 0.1s ease; }
         .task-card:active { cursor: grabbing; }
-        .task-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .task-card:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-gray-800 p-4 md:p-8">
+<body class="text-gray-800 p-3 md:p-6 text-xs bg-[#fbfbfa]">
 
-    <header class="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-6">
-        <div>
-            <h1 class="text-3xl font-bold tracking-wider text-gray-900">HOUMY</h1>
-            <p class="text-sm text-gray-500 mt-1">Darbo delegavimo ir failų sistema • Versija 2.1 Pro</p>
+    <header class="max-w-6xl mx-auto mb-4 flex justify-between items-center border-b border-gray-200 pb-3">
+        <div class="flex items-baseline gap-2">
+            <h1 class="text-2xl font-black tracking-wider text-gray-900">HOUMY</h1>
+            <span class="text-[10px] text-gray-400 font-medium">v2.1 <span class="text-green-600 ml-1">● Online</span></span>
         </div>
-        <div class="flex flex-wrap gap-2 w-full md:w-auto">
-            <button onclick="openFilesModal()" class="flex-1 sm:flex-none bg-indigo-50 border border-indigo-200 text-indigo-700 px-5 py-2.5 rounded-xl hover:bg-indigo-100 transition text-sm font-semibold flex items-center justify-center gap-1.5 shadow-sm">
+        <div class="flex gap-1.5">
+            <button onclick="openFilesModal()" class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition font-bold shadow-sm">
                 📁 Failinė
             </button>
-            <button onclick="openHistoryModal()" class="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium flex items-center justify-center gap-1">
+            <button onclick="openHistoryModal()" class="border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition font-medium">
                 📋 Žurnalas
             </button>
-            <button class="border border-gray-300 text-gray-400 px-4 py-2.5 rounded-xl text-sm font-medium cursor-default hidden sm:inline-block">
-                Debesų sinchronizacija ☁️ Aktyvi
-            </button>
-            <button onclick="openCreateModal()" class="flex-1 sm:flex-none bg-gray-900 text-white px-6 py-2.5 rounded-xl shadow-sm hover:bg-gray-800 transition font-medium text-sm tracking-wide">
-                + Nauja užduotis
+            <button onclick="openCreateModal()" class="bg-gray-900 text-white px-4 py-1.5 rounded-lg shadow-sm hover:bg-gray-800 transition font-bold">
+                + Nauja
             </button>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-        <div class="relative flex-1 max-w-xs">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">🔍</span>
-            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white outline-none transition" placeholder="Paieška...">
+    <div class="max-w-6xl mx-auto mb-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white p-2.5 rounded-xl border border-gray-200/80 shadow-sm">
+        <div class="relative max-w-xs w-full">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-gray-400">🔍</span>
+            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-gray-300 bg-gray-50 text-xs focus:bg-white outline-none transition" placeholder="Greita paieška...">
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
-            <button id="filter-all" onclick="setFilter('all')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')" class="px-4 py-2 rounded-lg text-sm font-bold transition bg-gray-900 text-white shadow-sm border border-transparent">
+        <div class="flex flex-wrap items-center gap-1">
+            <button id="filter-all" onclick="setFilter('all')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')" class="px-3 py-1.5 rounded-lg font-bold transition bg-gray-900 text-white shadow-sm border border-transparent">
                 👥 VISI
             </button>
-            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
+            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-3 py-1.5 rounded-lg font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
                 👤 Ramūnas
             </button>
-            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
+            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-3 py-1.5 rounded-lg font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
                 👤 Ingrida
             </button>
-            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
+            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-3 py-1.5 rounded-lg font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
                 👤 Aušrinė
             </button>
         </div>
 
-        <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200 shadow-inner">
-            <button id="view-kanban" onclick="setLayout('kanban')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">📊 Stulpeliai</button>
-            <button id="view-rows" onclick="setLayout('rows')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900">☰ Juostos</button>
+        <div class="flex items-center gap-0.5 bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+            <button id="view-kanban" onclick="setLayout('kanban')" class="px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]">📊 Stulpeliai</button>
+            <button id="view-rows" onclick="setLayout('rows')" class="px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]">☰ Juostos</button>
         </div>
     </div>
 
-    <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        <div id="col-todo" class="kanban-col bg-gray-50 rounded-2xl p-4 border border-gray-200 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
-            <h2 class="font-bold text-gray-700 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Naujos</span></div>
-                <span id="count-todo" class="bg-gray-200 text-gray-600 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+    <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
+        <div id="col-todo" class="kanban-col bg-gray-50 rounded-xl p-3 border border-gray-200/80 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
+            <h2 class="font-bold text-gray-600 text-sm mb-3 flex items-center justify-between px-0.5 shrink-0">
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Naujos</span></div>
+                <span id="count-todo" class="bg-gray-200 text-gray-600 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
             </h2>
-            <div id="tasks-todo"></div>
+            <div id="tasks-todo" class="space-y-2 flex-1"></div>
         </div>
-        <div id="col-progress" class="kanban-col bg-blue-50/40 rounded-2xl p-4 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
-            <h2 class="font-bold text-blue-900 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
-                <span id="count-progress" class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+        <div id="col-progress" class="kanban-col bg-blue-50/20 rounded-xl p-3 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
+            <h2 class="font-bold text-blue-900 text-sm mb-3 flex items-center justify-between px-0.5 shrink-0">
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
+                <span id="count-progress" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
             </h2>
-            <div id="tasks-progress"></div>
+            <div id="tasks-progress" class="space-y-2 flex-1"></div>
         </div>
-        <div id="col-done" class="kanban-col bg-green-50/40 rounded-2xl p-4 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
-            <h2 class="font-bold text-green-900 text-lg mb-4 flex items-center justify-between px-1 shrink-0">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span><span>Baigtos <span class="text-xs font-normal text-gray-400">(Šią savaitę)</span></span></div>
-                <span id="count-done" class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+        <div id="col-done" class="kanban-col bg-green-50/20 rounded-xl p-3 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
+            <h2 class="font-bold text-green-900 text-sm mb-3 flex items-center justify-between px-0.5 shrink-0">
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500"></span><span>Baigtos</span></div>
+                <span id="count-done" class="bg-green-100 text-green-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
             </h2>
-            <div id="tasks-done"></div>
+            <div id="tasks-done" class="space-y-2 flex-1"></div>
         </div>
     </div>
 
-    <div id="filesModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 flex flex-col h-[80vh]">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+    <div id="filesModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 flex flex-col h-[70vh]">
+            <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-xl font-bold text-gray-900">📁 Bendrinami gamybos failai</h3>
+                    <h3 class="text-sm font-bold text-gray-900">📁 Bendrinami gamybos failai</h3>
                     <input type="file" id="shelfFileInput" class="hidden" onchange="handleShelfFileSelect(this)">
-                    <button onclick="document.getElementById('shelfFileInput').click()" class="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition flex items-center gap-1 shadow-sm">
-                        + Įkelti naują failą
+                    <button onclick="document.getElementById('shelfFileInput').click()" class="bg-indigo-600 text-white text-[11px] font-bold px-2 py-1 rounded hover:bg-indigo-700 transition shadow-sm">
+                        + Įkelti failą
                     </button>
                 </div>
-                <button onclick="closeFilesModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                <button onclick="closeFilesModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
-            <div id="fileShelfContainer" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pr-1 no-scrollbar"></div>
-            <div class="flex justify-end border-t border-gray-100 pt-4 mt-4">
-                <button onclick="closeFilesModal()" class="px-5 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800">Uždaryti</button>
+            <div id="fileShelfContainer" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1 no-scrollbar"></div>
+            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3">
+                <button onclick="closeFilesModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-lg text-xs font-bold">Uždaryti</button>
             </div>
         </div>
     </div>
 
-    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 border border-gray-100 overflow-y-auto max-h-[90vh] no-scrollbar">
-            <div class="flex justify-between items-center mb-5">
-                <h3 id="modalTitle" class="text-xl font-bold text-gray-900">Sukurti naują užduotį</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 border border-gray-100 overflow-y-auto max-h-[85vh] no-scrollbar">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-base font-bold text-gray-900">Sukurti naują užduotį</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
             <input type="hidden" id="editingId">
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Užduoties pavadinimas *</label>
-                <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900">
+            <div class="mb-3">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Užduoties pavadinimas *</label>
+                <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none text-xs focus:ring-1 focus:ring-gray-900">
             </div>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Aprašymas</label>
-                <textarea id="taskDesc" rows="2" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-gray-900"></textarea>
+            <div class="mb-3">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Aprašymas</label>
+                <textarea id="taskDesc" rows="2" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none text-xs focus:ring-1 focus:ring-gray-900"></textarea>
             </div>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">🔗 Susijusi nuoroda (Gmail, Google Drive, Svetainė...)</label>
-                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-xl p-3 outline-none text-sm" placeholder="Įklijuokite Gmail laiško, Drive ar bet kokią internetinę nuorodą...">
+            <div class="mb-3">
+                <label class="block text-[10px] font-bold text-indigo-600 uppercase tracking-wider mb-1">🔗 Susijusi nuoroda (Gmail, Drive, Katalogas...)</label>
+                <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/30 rounded-lg p-2.5 outline-none text-xs" placeholder="Įklijuokite bet kokią nuorodą...">
             </div>
 
-            <div class="mb-5 bg-amber-50/40 p-4 rounded-xl border border-amber-200/60">
-                <label class="block text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">📝 Darbo eigos užrašai / Komentarai</label>
-                <div id="commentsContainer" class="space-y-2 mb-3 max-h-36 overflow-y-auto no-scrollbar text-xs"></div>
-                <div class="flex gap-2">
-                    <input type="text" id="newCommentText" class="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none bg-white focus:border-amber-400" placeholder="Įrašykite naują situaciją ar info...">
-                    <button onclick="addCommentItem()" class="bg-gray-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-800 transition">Pridėti</button>
+            <div class="mb-3 bg-amber-50/40 p-3 rounded-lg border border-amber-200/50">
+                <label class="block text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-1.5">📝 Darbo eigos užrašai / Komentarai</label>
+                <div id="commentsContainer" class="space-y-1.5 mb-2 max-h-28 overflow-y-auto no-scrollbar text-[11px]"></div>
+                <div class="flex gap-1.5">
+                    <input type="text" id="newCommentText" class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs outline-none bg-white" placeholder="Įrašykite naują info...">
+                    <button onclick="addCommentItem()" class="bg-gray-900 text-white px-3 py-1 rounded-md text-[11px] font-bold">Pridėti</button>
                 </div>
             </div>
 
-            <div class="mb-5 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Sub-užduotys / Gamybos etapai</label>
-                <div id="checklistContainer" class="space-y-2 mb-3"></div>
-                <div class="flex gap-2">
-                    <input type="text" id="newChecklistItem" class="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none" placeholder="Pvz.: Paruošti specifikaciją...">
-                    <button onclick="addChecklistItem()" class="bg-gray-200 text-gray-800 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition">+ Pridėti</button>
+            <div class="mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Sub-užduotys / Gamybos etapai</label>
+                <div id="checklistContainer" class="space-y-1.5 mb-2"></div>
+                <div class="flex gap-1.5">
+                    <input type="text" id="newChecklistItem" class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs outline-none" placeholder="Pvz.: Paruošti specifikaciją...">
+                    <button onclick="addChecklistItem()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-[11px] font-bold">+ Pridėti</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Atsakingas asmuo</label>
-                    <select id="taskAssignee" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Atsakingas</label>
+                    <select id="taskAssignee" class="w-full border border-gray-300 rounded-lg p-2 bg-white outline-none">
                         <option value="Ramūnas">Ramūnas</option>
                         <option value="Ingrida">Ingrida</option>
                         <option value="Aušrinė">Aušrinė</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Atlikimo terminas</label>
-                    <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-xl p-3 outline-none">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Terminas</label>
+                    <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-lg p-2 outline-none">
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Prioritetas</label>
-                    <select id="taskPriority" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Prioritetas</label>
+                    <select id="taskPriority" class="w-full border border-gray-300 rounded-lg p-2 bg-white outline-none">
                         <option value="low">Žemas</option>
                         <option value="medium" selected>Vidutinis</option>
                         <option value="high">Skubu</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Kategorija</label>
-                    <select id="taskCategory" class="w-full border border-gray-300 rounded-xl p-3 bg-white outline-none">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Kategorija</label>
+                    <select id="taskCategory" class="w-full border border-gray-300 rounded-lg p-2 bg-white outline-none">
                         <option value="Užsakymai">Užsakymai</option>
                         <option value="Gamyba / Tiekėjai">Gamyba / Tiekėjai</option>
                         <option value="Marketingas">Marketingas</option>
@@ -186,25 +183,25 @@
                     </select>
                 </div>
             </div>
-            <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-                <button id="deleteBtn" onclick="deleteTask()" class="text-sm text-red-500 hover:text-red-700 font-medium hidden">Ištrinti užduotį</button>
-                <div class="flex space-x-3 ml-auto">
-                    <button onclick="closeModal()" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl text-sm font-medium">Atšaukti</button>
-                    <button onclick="saveTask()" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium">Išsaugoti</button>
+            <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+                <button id="deleteBtn" onclick="deleteTask()" class="text-xs text-red-500 hover:text-red-700 font-bold hidden">Ištrinti</button>
+                <div class="flex space-x-2 ml-auto">
+                    <button onclick="closeModal()" class="px-4 py-1.5 text-gray-500 hover:bg-gray-100 rounded-lg font-medium">Atšaukti</button>
+                    <button onclick="saveTask()" class="px-4 py-1.5 bg-gray-900 text-white rounded-lg font-bold">Išsaugoti</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col h-[80vh]">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                <h3 class="text-xl font-bold text-gray-900">Sistemos veiksmų žurnalas (Cloud)</h3>
-                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-4 flex flex-col h-[70vh]">
+            <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
+                <h3 class="text-sm font-bold text-gray-900">Sistemos veiksmų žurnalas (Cloud)</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
-            <div id="historyList" class="flex-1 overflow-y-auto space-y-2 pr-2 no-scrollbar text-sm"></div>
-            <div class="flex justify-end border-t border-gray-100 pt-4 mt-4">
-                <button onclick="closeHistoryModal()" class="px-5 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800">Uždaryti</button>
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-1.5 pr-1 no-scrollbar text-[11px]"></div>
+            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3">
+                <button onclick="closeHistoryModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-lg font-bold">Uždaryti</button>
             </div>
         </div>
     </div>
@@ -236,7 +233,7 @@
         let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
 
         const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
-        const categoryStyles = { 'Užsakymai': 'bg-purple-100 text-purple-800', 'Gamyba / Tiekėjai': 'bg-blue-100 text-blue-800', 'Marketingas': 'bg-pink-100 text-pink-800', 'Kita': 'bg-gray-200 text-gray-700' };
+        const categoryStyles = { 'Užsakymai': 'bg-purple-50 text-purple-700', 'Gamyba / Tiekėjai': 'bg-blue-50 text-blue-700', 'Marketingas': 'bg-pink-50 text-pink-700', 'Kita': 'bg-gray-100 text-gray-600' };
 
         function setLayout(layout) {
             currentLayout = layout;
@@ -252,21 +249,21 @@
             const statuses = ['todo', 'progress', 'done'];
 
             if (currentLayout === 'rows') {
-                boardWrapper.className = "flex flex-col gap-6 max-w-6xl mx-auto";
+                boardWrapper.className = "flex flex-col gap-3 max-w-6xl mx-auto";
                 statuses.forEach(status => {
-                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col gap-3`;
-                    document.getElementById(`tasks-${status}`).className = "flex flex-col gap-2 w-full pt-1";
+                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/20 border-blue-100' : 'bg-green-50/20 border-green-100'} rounded-xl p-2.5 border flex flex-col gap-1.5`;
+                    document.getElementById(`tasks-${status}`).className = "flex flex-col gap-1 w-full";
                 });
-                btnRows.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-white shadow-sm text-gray-900";
-                btnKanban.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900";
+                btnRows.className = "px-2.5 py-1 rounded-md font-bold transition bg-white shadow-sm text-gray-900 text-[11px]";
+                btnKanban.className = "px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]";
             } else {
-                boardWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto";
+                boardWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto";
                 statuses.forEach(status => {
-                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/40 border-blue-100' : 'bg-green-50/40 border-green-100'} rounded-2xl p-4 border flex flex-col`;
-                    document.getElementById(`tasks-${status}`).className = "space-y-3 flex-1 min-h-[300px] pt-1";
+                    document.getElementById(`col-${status}`).className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200/80' : status === 'progress' ? 'bg-blue-50/20 border-blue-100' : 'bg-green-50/20 border-green-100'} rounded-xl p-3 border flex flex-col`;
+                    document.getElementById(`tasks-${status}`).className = "space-y-2 flex-1 min-h-[250px] pt-0.5";
                 });
-                btnKanban.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-white shadow-sm text-gray-900";
-                btnRows.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-gray-500 hover:text-gray-900";
+                btnKanban.className = "px-2.5 py-1 rounded-md font-bold transition bg-white shadow-sm text-gray-900 text-[11px]";
+                btnRows.className = "px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]";
             }
         }
 
@@ -293,12 +290,12 @@
 
         async function handleFileUpload(file, targetMember) {
             const savedSender = localStorage.getItem('houmy_user_name') || "Ramūnas";
-            const sender = prompt(`Kas siunčia failą „${file.name}“? \n(Įrašykite: Ramūnas, Ingrida arba Aušrinė)`, savedSender);
+            const sender = prompt(`Kas siunčia failą „${file.name}“?`, savedSender);
             if (!sender) return;
             localStorage.setItem('houmy_user_name', sender);
             
             const targetName = targetMember === 'all' ? 'VISIEMS' : targetMember;
-            logAction(`Įkeliamas failas: „${file.name}“ ➔ Kam: ${targetName}`);
+            logAction(`Failas: „${file.name}“ ➔ Kam: ${targetName}`);
 
             try {
                 const fileRef = ref(storage, `houmy_shared/${Date.now()}_${file.name}`);
@@ -311,7 +308,7 @@
                     name: file.name, url: downloadUrl, storagePath: fileRef.fullPath, from: sender, to: targetName, timestamp: Date.now(),
                     dateStr: new Date().toLocaleDateString('lt-LT') + ' ' + new Date().toLocaleTimeString('lt-LT', {hour: '2-digit', minute:'2-digit'})
                 });
-                logAction(`Sėkmingai pasidalinta failu: „${file.name}“`);
+                logAction(`Įkeltas failas: „${file.name}“`);
             } catch (error) {
                 alert("Klaida keliant failą!");
                 console.error(error);
@@ -319,11 +316,11 @@
         }
 
         async function deleteSharedFile(id, storagePath, name) {
-            if (confirm(`Ar tikrai ištrinti failą „${name}“?`)) {
-                logAction(`Trinamas failas: „${name}“`);
+            if (confirm(`Ar ištrinti failą „${name}“?`)) {
                 try {
                     await deleteDoc(doc(db, "shared_files", id));
                     await deleteObject(ref(storage, storagePath));
+                    logAction(`Ištrintas failas: „${name}“`);
                 } catch (e) { console.error(e); }
             }
         }
@@ -335,88 +332,25 @@
         function renderFileShelf() {
             const container = document.getElementById('fileShelfContainer'); container.innerHTML = '';
             if (sharedFiles.length === 0) {
-                container.innerHTML = `<div class="text-gray-400 text-sm py-8 text-center col-span-full italic">Failinė tuščia. Galite įkelti failą viršuje arba užmesdami jį ant komandos nario vardo lentoje.</div>`;
+                container.innerHTML = `<div class="text-gray-400 text-xs py-6 text-center col-span-full italic">Failinė tuščia.</div>`;
                 return;
             }
             sharedFiles.forEach(file => {
                 const item = document.createElement('div');
-                item.className = 'bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col justify-between shadow-sm relative group';
+                item.className = 'bg-gray-50 p-2 rounded-lg border border-gray-200 flex flex-col justify-between relative group';
                 item.innerHTML = `
-                    <button onclick="deleteSharedFile('${file.id}', '${file.storagePath}', '${file.name}')" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 font-bold text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
+                    <button onclick="deleteSharedFile('${file.id}', '${file.storagePath}', '${file.name}')" class="absolute top-1 right-1.5 text-gray-300 hover:text-red-500 font-bold text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
                     <div>
-                        <div class="text-[10px] text-gray-400 font-mono mb-1">${file.dateStr}</div>
-                        <div class="text-xs font-bold text-gray-900 truncate pr-4" title="${file.name}">📄 ${file.name}</div>
-                        <div class="mt-2 flex flex-wrap gap-1 text-[10px]">
-                            <span class="bg-white border border-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-medium">Nuo: ${file.from}</span>
-                            <span class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Kam: ${file.to}</span>
+                        <div class="text-[9px] text-gray-400 font-mono mb-0.5">${file.dateStr}</div>
+                        <div class="text-[11px] font-bold text-gray-900 truncate pr-3" title="${file.name}">📄 ${file.name}</div>
+                        <div class="mt-1 flex gap-1 text-[9px]">
+                            <span class="text-gray-500">Nuo: ${file.from}</span>
+                            <span class="text-indigo-600 font-bold">Kam: ${file.to}</span>
                         </div>
                     </div>
-                    <button onclick="forceDownload('${file.url}', '${file.name}')" class="mt-3 block w-full text-center bg-indigo-600 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg hover:bg-indigo-700 transition">Atsisiųsti į įrenginį 📥</button>
+                    <button onclick="forceDownload('${file.url}', '${file.name}')" class="mt-2 block w-full text-center bg-indigo-600 text-white text-[10px] font-bold py-1 rounded hover:bg-indigo-700 transition">Atsisiųsti 📥</button>
                 `;
                 container.appendChild(item);
-            });
-        }
-
-        function openCreateModal() {
-            currentChecklist = [];
-            currentComments = [];
-            document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
-            document.getElementById('editingId').value = '';
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskDesc').value = '';
-            document.getElementById('taskFileUrl').value = '';
-            document.getElementById('taskDate').value = '';
-            document.getElementById('taskPriority').value = 'medium';
-            document.getElementById('taskCategory').value = 'Kita';
-            document.getElementById('deleteBtn').classList.add('hidden');
-            renderChecklistDOM();
-            renderCommentsDOM();
-            document.getElementById('taskModal').classList.remove('hidden');
-        }
-
-        function openEditModal(id) {
-            const task = tasks.find(t => t.id === id);
-            if (!task) return;
-            currentChecklist = task.checklist || [];
-            currentComments = task.comments || [];
-            document.getElementById('modalTitle').innerText = 'Redaguoti užduotį';
-            document.getElementById('editingId').value = task.id;
-            document.getElementById('taskTitle').value = task.title;
-            document.getElementById('taskDesc').value = task.desc || '';
-            document.getElementById('taskFileUrl').value = task.fileUrl || '';
-            document.getElementById('taskDate').value = task.date || '';
-            document.getElementById('taskPriority').value = task.priority || 'medium';
-            document.getElementById('taskCategory').value = task.category || 'Kita';
-            document.getElementById('taskAssignee').value = task.assignee || 'Ramūnas';
-            document.getElementById('deleteBtn').classList.remove('hidden');
-            renderChecklistDOM();
-            renderCommentsDOM();
-            document.getElementById('taskModal').classList.remove('hidden');
-        }
-
-        function closeModal() { document.getElementById('taskModal').classList.add('hidden'); }
-        
-        function addChecklistItem() {
-            const input = document.getElementById('newChecklistItem');
-            const text = input.value.trim(); if (!text) return;
-            currentChecklist.push({ text: text, done: false }); input.value = ''; renderChecklistDOM();
-        }
-        function toggleChecklistState(index) { currentChecklist[index].done = !currentChecklist[index].done; renderChecklistDOM(); }
-        function removeChecklistItem(index) { currentChecklist.splice(index, 1); renderChecklistDOM(); }
-
-        function renderChecklistDOM() {
-            const container = document.getElementById('checklistContainer'); container.innerHTML = '';
-            currentChecklist.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between bg-white p-2 border border-gray-200 rounded-lg text-sm';
-                div.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleChecklistState(${idx})" class="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900">
-                        <span class="${item.done ? 'line-through text-gray-400' : 'text-gray-700'}">${item.text}</span>
-                    </div>
-                    <button onclick="removeChecklistItem(${idx})" class="text-red-400 hover:text-red-600 text-xs font-bold px-1">✕</button>
-                `;
-                container.appendChild(div);
             });
         }
 
@@ -424,7 +358,6 @@
             const input = document.getElementById('newCommentText');
             const text = input.value.trim(); if (!text) return;
             const author = localStorage.getItem('houmy_user_name') || "Ramūnas";
-            
             const now = new Date();
             const timeStr = now.toLocaleDateString('lt-LT', {month: '2-digit', day: '2-digit'}) + ' ' + now.toLocaleTimeString('lt-LT', {hour: '2-digit', minute: '2-digit'});
             
@@ -436,18 +369,18 @@
         function renderCommentsDOM() {
             const container = document.getElementById('commentsContainer'); container.innerHTML = '';
             if (currentComments.length === 0) {
-                container.innerHTML = `<div class="text-gray-400 italic py-1">Užrašų ar gautos info atnaujinimų dar nėra.</div>`;
+                container.innerHTML = `<div class="text-gray-400 italic text-[10px]">Užrašų nėra.</div>`;
                 return;
             }
             currentComments.forEach((item) => {
                 const div = document.createElement('div');
-                div.className = 'bg-white p-2 border border-amber-100 rounded-lg shadow-inner';
+                div.className = 'bg-white p-1.5 border border-amber-100 rounded shadow-sm';
                 div.innerHTML = `
-                    <div class="flex justify-between text-[10px] text-gray-400 font-medium mb-0.5">
-                        <span class="text-amber-800 font-bold">👤 ${item.author}</span>
+                    <div class="flex justify-between text-[9px] text-gray-400 mb-0.5">
+                        <span class="text-amber-800 font-bold">${item.author}</span>
                         <span>${item.time}</span>
                     </div>
-                    <div class="text-gray-700 text-xs">${item.text}</div>
+                    <div class="text-gray-700 text-[11px] leading-tight">${item.text}</div>
                 `;
                 container.appendChild(div);
             });
@@ -456,11 +389,11 @@
 
         function openHistoryModal() {
             const listContainer = document.getElementById('historyList'); listContainer.innerHTML = '';
-            if (historyLog.length === 0) { listContainer.innerHTML = `<div class="text-gray-400 text-center py-8">Žurnalas tuščias.</div>`; } 
+            if (historyLog.length === 0) { listContainer.innerHTML = `<div class="text-gray-400 text-center py-4">Žurnalas tuščias.</div>`; } 
             else {
                 historyLog.forEach(item => {
-                    const el = document.createElement('div'); el.className = 'p-2.5 bg-gray-50 border border-gray-100 rounded-lg flex items-start gap-3';
-                    el.innerHTML = `<span class="text-xs font-mono bg-gray-200 text-gray-600 px-2 py-0.5 rounded shrink-0">${item.time}</span> <span class="text-gray-700">${item.text}</span>`;
+                    const el = document.createElement('div'); el.className = 'p-1.5 bg-gray-50 border border-gray-100 rounded flex gap-2 items-baseline';
+                    el.innerHTML = `<span class="text-[9px] font-mono bg-gray-200 text-gray-500 px-1 rounded shrink-0">${item.time}</span> <span class="text-gray-600">${item.text}</span>`;
                     listContainer.appendChild(el);
                 });
             }
@@ -469,7 +402,7 @@
         function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
 
         async function logAction(text) {
-            const now = new Date(); const timeStr = now.toLocaleDateString('lt-LT') + ' ' + now.toLocaleTimeString('lt-LT', { hour: '2-digit', minute: '2-digit' });
+            const now = new Date(); const timeStr = now.toLocaleDateString('lt-LT', {month: '2-digit', day: '2-digit'}) + ' ' + now.toLocaleTimeString('lt-LT', { hour: '2-digit', minute: '2-digit' });
             await addDoc(collection(db, "history"), { time: timeStr, text: text, timestamp: now.getTime() });
         }
 
@@ -496,32 +429,27 @@
             if (id) {
                 const oldTask = tasks.find(t => t.id === id);
                 const wasTransferred = oldTask.assignee !== assignee;
-                if (wasTransferred) logAction(`Užduotis „${title}“ perleista nariui: ${assignee}`);
+                if (wasTransferred) logAction(`„${title}“ ➔ ${assignee}`);
                 
                 const oldCommentsLength = oldTask.comments ? oldTask.comments.length : 0;
                 if (currentComments.length > oldCommentsLength) {
                     const lastComment = currentComments[currentComments.length - 1];
-                    logAction(`Užduotyje „${title}“ ${lastComment.author} pridėjo info: "${lastComment.text}"`);
-                } else {
-                    if (!wasTransferred) logAction(`Atnaujinta užduotis „${title}“`);
+                    logAction(`„${title}“ užrašas: "${lastComment.text}"`);
                 }
-
                 await updateDoc(doc(db, "tasks", id), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, comments: currentComments, isTransferred: wasTransferred ? true : oldTask.isTransferred });
             } else {
                 await addDoc(collection(db, "tasks"), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, comments: currentComments, status: 'todo', createdAt: todayStr, isTransferred: false });
-                logAction(`Sukurta užduotis: „${title}“ (Atsakingas: ${assignee})`);
+                logAction(`Sukurta užduotis: „${title}“`);
             }
             closeModal();
         }
 
         async function deleteTask() {
             const id = document.getElementById('editingId').value;
-            if (id) {
+            if (id && confirm('Ištrinti užduotį?')) {
                 const task = tasks.find(t => t.id === id);
-                if (task && confirm('Ar tikrai norite ištrinti užduotį?')) {
-                    logAction(`Ištrinta užduotis: „${task.title}“`);
-                    await deleteDoc(doc(db, "tasks", id)); closeModal();
-                }
+                logAction(`Ištrinta: „${task.title}“`);
+                await deleteDoc(doc(db, "tasks", id)); closeModal();
             }
         }
 
@@ -534,17 +462,17 @@
         function dragEnterAssignee(member, ev) { 
             const btn = document.getElementById(`filter-${member}`);
             if (isFileDrag(ev)) { btn.classList.add('file-hover'); } 
-            else { btn.classList.add('bg-indigo-100', 'text-indigo-800'); }
+            else { btn.classList.add('bg-indigo-50'); }
         }
         function dragLeaveAssignee(member) { 
             const btn = document.getElementById(`filter-${member}`);
-            btn.classList.remove('bg-indigo-100', 'text-indigo-800', 'file-hover'); updateFilterButtonUI(); 
+            btn.classList.remove('bg-indigo-50', 'file-hover'); updateFilterButtonUI(); 
         }
 
         async function dropAssignee(ev, newAssignee) {
             ev.preventDefault();
             const btn = document.getElementById(`filter-${newAssignee}`);
-            btn.classList.remove('bg-indigo-100', 'text-indigo-800', 'file-hover');
+            btn.classList.remove('bg-indigo-50', 'file-hover');
             
             if (ev.dataTransfer.files && ev.dataTransfer.files.length > 0) {
                 const file = ev.dataTransfer.files[0];
@@ -553,18 +481,16 @@
             const id = ev.dataTransfer.getData("text/plain");
             const task = tasks.find(t => t.id === id);
             if (task && newAssignee !== 'all' && task.assignee !== newAssignee) {
-                logAction(`Užduotis „${task.title}“ pervilkta nariui: ${newAssignee}`);
+                logAction(`„${task.title}“ pervilkta ➔ ${newAssignee}`);
                 await updateDoc(doc(db, "tasks", id), { assignee: newAssignee, isTransferred: true });
             } else { updateFilterButtonUI(); }
         }
 
         async function drop(ev, newStatus) {
             ev.preventDefault();
-            const cols = ['col-todo', 'col-progress', 'col-done']; cols.forEach(c => document.getElementById(c).classList.remove('drag-over'));
+            document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
             const id = ev.dataTransfer.getData("text/plain"); const task = tasks.find(t => t.id === id);
             if (task && task.status !== newStatus) {
-                const statusNames = { todo: 'Naujos', progress: 'Vykdomos', done: 'Baigtos' };
-                logAction(`Užduotis „${task.title}“ perkelta į: ${statusNames[newStatus]}`);
                 const updateData = { status: newStatus }; if (newStatus === 'done') updateData.completedAt = new Date().toISOString().split('T')[0];
                 await updateDoc(doc(db, "tasks", id), updateData);
             }
@@ -588,90 +514,67 @@
                 if (task.status === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
                 globalCounts[task.status]++;
 
-                let dateBadgeStyle = "text-gray-600 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-xs"; let overdueWarning = "";
+                let dateBadgeStyle = "text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-[10px]";
                 if (task.date && task.status !== 'done') {
                     const taskDeadline = new Date(task.date); taskDeadline.setHours(0,0,0,0);
-                    if (taskDeadline < today) { dateBadgeStyle = "text-red-800 bg-red-100 font-bold border border-red-200 px-2 py-0.5 rounded animate-pulse text-xs"; overdueWarning = "⚠️ VĖLUOJA! "; }
+                    if (taskDeadline < today) { dateBadgeStyle = "text-red-700 bg-red-50 font-bold border border-red-200 px-1.5 py-0.5 rounded text-[10px] animate-pulse"; }
                 }
 
-                const pDot = `<span class="w-3 h-3 rounded-full ${priorityDots[task.priority]} shrink-0"></span>`;
-                const catBadge = task.category ? `<span class="text-[10px] px-2 py-0.5 rounded font-medium ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
-                const transferBadge = task.isTransferred ? `<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">Permesta 🔄</span>` : '';
+                const pDot = `<span class="w-2.5 h-2.5 rounded-full ${priorityDots[task.priority]} shrink-0"></span>`;
+                const catBadge = task.category ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
+                const transferBadge = task.isTransferred ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-indigo-50 text-indigo-600 border border-indigo-100">🔄</span>` : '';
 
-                let commentBadgeHTML = "";
-                if (task.comments && task.comments.length > 0) {
-                    const lastComment = task.comments[task.comments.length - 1];
-                    commentBadgeHTML = `<div class="mt-2 text-xs bg-amber-50/70 border border-amber-200/50 p-2 rounded-lg text-gray-700 line-clamp-2 shadow-sm" title="${lastComment.author}: ${lastComment.text}">
-                        <span class="font-bold text-amber-900">📝 ${lastComment.author}:</span> ${lastComment.text}
-                    </div>`;
-                }
-
-                // 🧠 SUTVARKYTA LOGIKA: Automatinis nuorodos tipo atpažinimas pagal adresą
-                let linkLabel = "🔗 Nuoroda";
-                let linkStyle = "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100";
-                
+                let linkLabel = "🔗 Nuoroda"; let linkStyle = "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100";
                 if (task.fileUrl) {
-                    if (task.fileUrl.includes("mail.google.com")) {
-                        linkLabel = "📧 Gmail laiškas";
-                        linkStyle = "bg-red-50 border-red-200 text-red-700 hover:bg-red-100";
-                    } else if (task.fileUrl.includes("drive.google.com") || task.fileUrl.includes("docs.google.com")) {
-                        linkLabel = "📁 Drive failas";
-                        linkStyle = "bg-green-50 border-green-200 text-green-700 hover:bg-green-100";
-                    }
+                    if (task.fileUrl.includes("mail.google.com")) { linkLabel = "📧 Gmail"; linkStyle = "bg-red-50 border-red-100 text-red-600 hover:bg-red-100"; } 
+                    else if (task.fileUrl.includes("drive.google.com") || task.fileUrl.includes("docs.google.com")) { linkLabel = "📁 Drive"; linkStyle = "bg-green-50 border-green-100 text-green-600 hover:bg-green-100"; }
                 }
 
                 const card = document.createElement('div');
                 card.setAttribute('draggable', 'true'); card.addEventListener('dragstart', (e) => drag(e, task.id)); card.onclick = () => openEditModal(task.id);
 
                 if (currentLayout === 'rows') {
-                    let checklistMini = "";
-                    if (task.checklist && task.checklist.length > 0) {
-                        const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length;
-                        checklistMini = `<span class="text-xs text-gray-500 font-medium whitespace-nowrap bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md">📋 ${doneCount}/${total}</span>`;
-                    }
-                    let fileIcon = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="${linkStyle} font-bold text-xs px-2.5 py-0.5 rounded-md border shadow-sm whitespace-nowrap transition">${linkLabel}</button>` : '';
+                    // TANKUS IR MINIMALISTINIS ROW REŽIMAS
+                    let checklistMini = (task.checklist && task.checklist.length > 0) ? `<span class="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">📋 ${task.checklist.filter(i => i.done).length}/${task.checklist.length}</span>` : '';
+                    let fileIcon = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="${linkStyle} font-bold text-[10px] px-2 py-0.5 rounded border transition shadow-sm">${linkLabel}</button>` : '';
 
-                    card.className = "task-card bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full";
+                    card.className = "task-card bg-white p-2 rounded-xl shadow-sm border border-gray-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 w-full text-[11px]";
                     card.innerHTML = `
-                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 flex-1 min-w-0">
-                            <div class="flex items-center gap-3">
-                                ${pDot}
-                                <h4 class="font-bold text-gray-900 text-sm truncate">${task.title}</h4>
-                            </div>
-                            <div class="flex-1 min-w-0 md:max-w-md">
-                                ${commentBadgeHTML ? commentBadgeHTML : task.desc ? `<span class="text-xs text-gray-400 truncate block">— ${task.desc}</span>` : ''}
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            ${pDot}
+                            <div class="truncate flex items-baseline gap-2">
+                                <h4 class="font-bold text-gray-900">${task.title}</h4>
+                                ${commentBadgeHTML ? `<span class="text-amber-700 font-medium text-[10px] max-w-xs truncate">${commentBadgeHTML.replace(/<\/?[^>]+(>|$)/g, "")}</span>` : task.desc ? `<span class="text-gray-400 text-[10px] truncate max-w-xs">— ${task.desc}</span>` : ''}
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap justify-start sm:justify-end">
+                        <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
                             ${catBadge} ${transferBadge} ${checklistMini} ${fileIcon}
-                            <div class="text-[11px] text-gray-400 min-w-[90px] text-left sm:text-right">
-                                ${task.date ? `<span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span>` : '<span class="text-gray-300">Nėra termino</span>'}
-                            </div>
-                            <span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md border border-gray-200 min-w-[75px] text-center">${task.assignee}</span>
+                            <span class="${dateBadgeStyle}">${task.date ? '🏁 ' + task.date : 'Nėra termino'}</span>
+                            <span class="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200 min-w-[65px] text-center">${task.assignee}</span>
                         </div>
                     `;
                 } else {
+                    // TANKUS IR MINIMALISTINIS KANBAN REŽIMAS
                     let checklistHTML = "";
                     if (task.checklist && task.checklist.length > 0) {
                         const total = task.checklist.length; const doneCount = task.checklist.filter(item => item.done).length; const pct = Math.round((doneCount / total) * 100);
-                        checklistHTML = `<div class="mt-3"><div class="flex justify-between items-center text-[11px] font-semibold text-gray-500 mb-1"><span>Etapai: ${doneCount}/${total}</span><span>${pct}%</span></div><div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden"><div class="bg-gray-800 h-1.5 transition-all duration-300" style="width: ${pct}%"></div></div></div>`;
+                        checklistHTML = `<div class="mt-2 flex items-center gap-2 text-[10px] text-gray-400 font-medium"><span>📋 ${doneCount}/${total}</span><div class="flex-1 bg-gray-200 h-1 rounded-full overflow-hidden"><div class="bg-gray-700 h-1 transition-all duration-300" style="width: ${pct}%"></div></div></div>`;
                     }
-                    let fileButtonHTML = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="mt-3 inline-flex items-center justify-center gap-1.5 w-full ${linkStyle} border text-xs font-bold py-2 px-3 rounded-lg transition shadow-sm">${linkLabel}</button>` : '';
+                    let fileButtonHTML = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="mt-2 inline-flex items-center justify-center gap-1 w-full ${linkStyle} border text-[10px] font-bold py-1 rounded transition shadow-sm">${linkLabel}</button>` : '';
 
-                    card.className = "task-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative w-full";
+                    card.className = "task-card bg-white p-2.5 rounded-xl shadow-sm border border-gray-200 relative w-full";
                     card.innerHTML = `
-                        <div class="flex justify-between items-center mb-2.5"><div class="flex flex-wrap gap-2 items-center">${pDot}${catBadge}${transferBadge}</div></div>
-                        <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2">${task.title}</h4>
-                        ${task.desc ? `<p class="text-xs text-gray-500 mb-2 line-clamp-2">${task.desc}</p>` : ''}
+                        <div class="flex justify-between items-center mb-1.5"><div class="flex flex-wrap gap-1 items-center">${pDot}${catBadge}${transferBadge}</div><span class="text-[10px] font-bold bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-100">${task.assignee}</span></div>
+                        <h4 class="font-bold text-gray-900 text-xs mb-0.5 tracking-wide leading-snug">${task.title}</h4>
+                        ${task.desc ? `<p class="text-gray-400 text-[11px] leading-tight mb-1 line-clamp-2">${task.desc}</p>` : ''}
                         
                         ${commentBadgeHTML}
-                        
                         ${checklistHTML} ${fileButtonHTML}
-                        <div class="text-[11px] text-gray-400 mt-3 space-y-0.5 pt-2 border-t border-gray-50">
-                            <div>📅 Sukurta: <span class="font-medium text-gray-600">${task.createdAt || ''}</span></div>
-                            ${task.date ? `<div>🏁 Terminas: <span class="${dateBadgeStyle}">${overdueWarning}${task.date}</span></div>` : ''}
+                        
+                        <div class="flex justify-between items-center text-[9px] text-gray-400 mt-2 pt-1.5 border-t border-gray-100/60">
+                            <div>⏱️ ${task.createdAt || ''}</div>
+                            ${task.date ? `<div class="${dateBadgeStyle}">🏁 ${task.date}</div>` : ''}
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 mt-2"><span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-md border border-gray-200">${task.assignee}</span></div>
                     `;
                 }
                 lists[task.status].appendChild(card);
@@ -684,7 +587,7 @@
             const buttons = ['all', 'Ramūnas', 'Ingrida', 'Aušrinė'];
             buttons.forEach(b => {
                 const btn = document.getElementById(`filter-${b}`);
-                if (btn) btn.className = b === currentFilter ? "px-4 py-2 rounded-lg text-sm font-bold transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-4 py-2 rounded-lg text-sm font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent";
+                if (btn) btn.className = b === currentFilter ? "px-3 py-1.5 rounded-lg font-bold transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-3 py-1.5 rounded-lg font-bold transition text-gray-500 hover:bg-gray-100 border border-transparent";
             });
         }
 
