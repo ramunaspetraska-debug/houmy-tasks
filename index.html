@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOUMY | Užduotys V2.1</title>
+    <title>HOUMY</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="HOUMY Užduotys">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -22,166 +21,164 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-gray-800 p-3 md:p-6 text-xs bg-[#fbfbfa]">
+<body class="text-gray-800 p-3 md:p-6 text-xs bg-[#fbfbfa] select-none">
 
-    <header class="max-w-6xl mx-auto mb-4 flex justify-between items-center border-b border-gray-200 pb-3">
-        <div class="flex items-baseline gap-2">
-            <h1 class="text-2xl font-black tracking-wider text-gray-900">HOUMY</h1>
-            <span class="text-[10px] text-gray-400 font-medium">v2.1 <span class="text-green-600 ml-1">● Online</span></span>
+    <header class="max-w-6xl mx-auto mb-4 flex justify-between items-center border-b border-gray-200 pb-2">
+        <div class="flex items-center gap-1.5">
+            <h1 class="text-xl font-black tracking-wider text-gray-900">HOUMY</h1>
+            <span class="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse" title="Connected"></span>
         </div>
-        <div class="flex gap-1.5">
-            <button onclick="openFilesModal()" class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition font-bold shadow-sm">
-                📁 Failinė
+        <div class="flex gap-1">
+            <button onclick="openFilesModal()" class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded-lg hover:bg-indigo-100 transition font-bold shadow-sm">
+                📁 Failai
             </button>
-            <button onclick="openHistoryModal()" class="border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition font-medium">
+            <button onclick="openHistoryModal()" class="border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition font-medium">
                 📋 Žurnalas
             </button>
-            <button onclick="openCreateModal()" class="bg-gray-900 text-white px-4 py-1.5 rounded-lg shadow-sm hover:bg-gray-800 transition font-bold">
+            <button onclick="openCreateModal()" class="bg-gray-900 text-white px-3.5 py-1.5 rounded-lg shadow-sm hover:bg-gray-800 transition font-bold">
                 + Nauja
             </button>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto mb-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white p-2.5 rounded-xl border border-gray-200/80 shadow-sm">
-        <div class="relative max-w-xs w-full">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-gray-400">🔍</span>
-            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-gray-300 bg-gray-50 text-xs focus:bg-white outline-none transition" placeholder="Greita paieška...">
+    <div class="max-w-6xl mx-auto mb-4 flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
+        <div class="relative max-w-[180px] w-full">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none text-gray-400">🔍</span>
+            <input type="text" id="searchBar" oninput="renderTasks()" class="w-full pl-6 pr-2 py-1 rounded-md border border-gray-300 bg-gray-50 text-xs focus:bg-white outline-none transition" placeholder="">
         </div>
 
         <div class="flex flex-wrap items-center gap-1">
-            <button id="filter-all" onclick="setFilter('all')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')" class="px-3 py-1.5 rounded-lg font-bold transition bg-gray-900 text-white shadow-sm border border-transparent">
-                👥 VISI
+            <button id="filter-all" onclick="setFilter('all')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('all', event)" ondragleave="dragLeaveAssignee('all')" ondrop="dropAssignee(event, 'all')" class="px-3 py-1 rounded-md font-bold transition bg-gray-900 text-white shadow-sm">
+                VISI
             </button>
-            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-3 py-1.5 rounded-lg font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
-                👤 Ramūnas
+            <button id="filter-Ramūnas" onclick="setFilter('Ramūnas')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ramūnas', event)" ondragleave="dragLeaveAssignee('Ramūnas')" ondrop="dropAssignee(event, 'Ramūnas')" class="px-3 py-1 rounded-md font-bold transition text-gray-500 hover:bg-gray-100">
+                Ramūnas
             </button>
-            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-3 py-1.5 rounded-lg font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
-                👤 Ingrida
+            <button id="filter-Ingrida" onclick="setFilter('Ingrida')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Ingrida', event)" ondragleave="dragLeaveAssignee('Ingrida')" ondrop="dropAssignee(event, 'Ingrida')" class="px-3 py-1 rounded-md font-bold transition text-gray-500 hover:bg-gray-100">
+                Ingrida
             </button>
-            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-3 py-1.5 rounded-lg font-bold transition text-gray-600 hover:bg-gray-100 border border-transparent">
-                👤 Aušrinė
+            <button id="filter-Aušrinė" onclick="setFilter('Aušrinė')" ondragover="allowDrop(event)" ondragenter="dragEnterAssignee('Aušrinė', event)" ondragleave="dragLeaveAssignee('Aušrinė')" ondrop="dropAssignee(event, 'Aušrinė')" class="px-3 py-1 rounded-md font-bold transition text-gray-500 hover:bg-gray-100">
+                Aušrinė
             </button>
         </div>
 
         <div class="flex items-center gap-0.5 bg-gray-100 p-0.5 rounded-lg border border-gray-200">
-            <button id="view-kanban" onclick="setLayout('kanban')" class="px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]">📊 Stulpeliai</button>
-            <button id="view-rows" onclick="setLayout('rows')" class="px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]">☰ Juostos</button>
+            <button id="view-kanban" onclick="setLayout('kanban')" class="px-2 py-0.5 rounded transition text-gray-500 hover:text-gray-900 font-medium text-[11px]">📊 Stulpeliai</button>
+            <button id="view-rows" onclick="setLayout('rows')" class="px-2 py-0.5 rounded transition text-gray-500 hover:text-gray-900 font-medium text-[11px]">☰ Eilutės</button>
         </div>
     </div>
 
-    <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
-        <div id="col-todo" class="kanban-col bg-gray-50 rounded-xl p-3 border border-gray-200/80 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
-            <h2 class="font-bold text-gray-600 text-sm mb-3 flex items-center justify-between px-0.5 shrink-0">
-                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Naujos</span></div>
-                <span id="count-todo" class="bg-gray-200 text-gray-600 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+    <div id="boardWrapper" class="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-6xl mx-auto">
+        <div id="col-todo" class="kanban-col bg-gray-50 rounded-xl p-2.5 border border-gray-200 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-todo')" ondragleave="dragLeave('col-todo')" ondrop="drop(event, 'todo')">
+            <h2 class="font-bold text-gray-500 text-xs mb-2 flex items-center justify-between px-0.5 shrink-0">
+                <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span><span>Naujos</span></div>
+                <span id="count-todo" class="bg-gray-200 text-gray-600 text-[10px] px-1.5 rounded-full font-bold">0</span>
             </h2>
-            <div id="tasks-todo" class="space-y-2 flex-1"></div>
+            <div id="tasks-todo" class="space-y-1.5 flex-1"></div>
         </div>
-        <div id="col-progress" class="kanban-col bg-blue-50/20 rounded-xl p-3 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
-            <h2 class="font-bold text-blue-900 text-sm mb-3 flex items-center justify-between px-0.5 shrink-0">
-                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
-                <span id="count-progress" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+        <div id="col-progress" class="kanban-col bg-blue-50/20 rounded-xl p-2.5 border border-blue-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-progress')" ondragleave="dragLeave('col-progress')" ondrop="drop(event, 'progress')">
+            <h2 class="font-bold text-blue-900 text-xs mb-2 flex items-center justify-between px-0.5 shrink-0">
+                <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span><span>Vykdomos</span></div>
+                <span id="count-progress" class="bg-blue-100 text-blue-800 text-[10px] px-1.5 rounded-full font-bold">0</span>
             </h2>
-            <div id="tasks-progress" class="space-y-2 flex-1"></div>
+            <div id="tasks-progress" class="space-y-1.5 flex-1"></div>
         </div>
-        <div id="col-done" class="kanban-col bg-green-50/20 rounded-xl p-3 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
-            <h2 class="font-bold text-green-900 text-sm mb-3 flex items-center justify-between px-0.5 shrink-0">
-                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500"></span><span>Baigtos</span></div>
-                <span id="count-done" class="bg-green-100 text-green-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+        <div id="col-done" class="kanban-col bg-green-50/20 rounded-xl p-2.5 border border-green-100 flex flex-col" ondragover="allowDrop(event)" ondragenter="dragEnter('col-done')" ondragleave="dragLeave('col-done')" ondrop="drop(event, 'done')">
+            <h2 class="font-bold text-green-900 text-xs mb-2 flex items-center justify-between px-0.5 shrink-0">
+                <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span><span>Baigtos</span></div>
+                <span id="count-done" class="bg-green-100 text-green-800 text-[10px] px-1.5 rounded-full font-bold">0</span>
             </h2>
-            <div id="tasks-done" class="space-y-2 flex-1"></div>
+            <div id="tasks-done" class="space-y-1.5 flex-1"></div>
         </div>
     </div>
 
     <div id="filesModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 flex flex-col h-[75vh]">
-            <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-2 shrink-0">
-                <div class="flex items-center gap-3">
-                    <h3 class="text-sm font-bold text-gray-900">📁 Bendrinami gamybos failai</h3>
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 flex flex-col h-[70vh]">
+            <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-1.5 shrink-0">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-xs font-bold text-gray-900">📁 Failinė</h3>
                     <input type="file" id="shelfFileInput" class="hidden" onchange="handleShelfFileSelect(this)">
-                    <button onclick="document.getElementById('shelfFileInput').click()" class="bg-indigo-600 text-white text-[11px] font-bold px-2 py-1 rounded hover:bg-indigo-700 transition shadow-sm">
-                        + Įkelti failą
-                    </button>
+                    <button onclick="document.getElementById('shelfFileInput').click()" class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded hover:bg-indigo-700 shadow-sm transition">+</button>
                 </div>
                 <button onclick="closeFilesModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
             
-            <div class="mb-3 bg-gray-50 border border-gray-200/80 p-2 rounded-lg shrink-0">
-                <div class="flex justify-between font-semibold text-[10px] text-gray-500 mb-1">
-                    <span id="storageText">Skaičiuojama vietos talpa...</span>
+            <div class="mb-2 bg-gray-50 border border-gray-200/60 p-1.5 rounded-md shrink-0">
+                <div class="flex justify-between font-semibold text-[9px] text-gray-500 mb-0.5">
+                    <span id="storageText">...</span>
                     <span id="storagePct">0%</span>
                 </div>
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div id="storageBar" class="bg-indigo-600 h-1.5 transition-all duration-300 w-0"></div>
+                <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
+                    <div id="storageBar" class="bg-indigo-600 h-1 transition-all duration-300 w-0"></div>
                 </div>
             </div>
 
-            <div id="fileShelfContainer" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1 no-scrollbar"></div>
-            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3 shrink-0">
-                <button onclick="closeFilesModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-xl text-xs font-bold">Uždaryti</button>
+            <div id="fileShelfContainer" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 pr-1 no-scrollbar"></div>
+            <div class="flex justify-end border-t border-gray-100 pt-2 mt-2 shrink-0">
+                <button onclick="closeFilesModal()" class="px-3 py-1 bg-gray-900 text-white rounded-md font-bold text-[11px]">Uždaryti</button>
             </div>
         </div>
     </div>
 
     <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-4 border border-gray-100 flex flex-col max-h-[85vh]">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-4 border border-gray-100 flex flex-col max-h-[82vh]">
             
-            <div class="flex justify-between items-center mb-3 shrink-0">
-                <h3 id="modalTitle" class="text-base font-bold text-gray-900">Sukurti naują užduotį</h3>
+            <div class="flex justify-between items-center mb-2 shrink-0">
+                <h3 id="modalTitle" class="text-xs font-bold text-gray-900">Užduotis</h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
             
             <input type="hidden" id="editingId">
             
-            <div class="flex-1 overflow-y-auto no-scrollbar space-y-2.5 pr-0.5 pb-2">
+            <div class="flex-1 overflow-y-auto no-scrollbar space-y-2 pr-0.5 pb-1.5">
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Užduoties pavadinimas *</label>
-                    <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-lg p-2 outline-none text-xs focus:ring-1 focus:ring-gray-900">
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">Pavadinimas *</label>
+                    <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded-md p-1.5 outline-none text-xs focus:ring-1 focus:ring-gray-900">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Aprašymas</label>
-                    <textarea id="taskDesc" rows="1" class="w-full border border-gray-300 rounded-lg p-2 outline-none text-xs focus:ring-1 focus:ring-gray-900"></textarea>
+                    <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">Aprašymas</label>
+                    <textarea id="taskDesc" rows="1" class="w-full border border-gray-300 rounded-md p-1.5 outline-none text-xs focus:ring-1 focus:ring-gray-900"></textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Atsakingas</label>
-                        <select id="taskAssignee" class="w-full border border-gray-300 rounded-lg p-1.5 bg-white outline-none">
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">Atsakingas</label>
+                        <select id="taskAssignee" class="w-full border border-gray-300 rounded-md p-1 bg-white outline-none">
                             <option value="Ramūnas">Ramūnas</option>
                             <option value="Ingrida">Ingrida</option>
                             <option value="Aušrinė">Aušrinė</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Terminas</label>
-                        <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-lg p-1.5 outline-none">
+                        <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">Terminas</label>
+                        <input type="date" id="taskDate" class="w-full border border-gray-300 rounded-md p-1 outline-none">
                     </div>
                 </div>
 
-                <div class="pt-1">
-                    <label class="flex items-center gap-2 text-[10px] font-bold text-gray-500 cursor-pointer select-none bg-gray-100 px-2 py-1 rounded-md border border-gray-200/60 w-fit hover:bg-gray-200 transition">
-                        <input type="checkbox" id="toggleAdvanced" onchange="toggleAdvancedFields()" class="rounded border-gray-300 text-gray-900 focus:ring-0 w-3 h-3">
-                        <span>⚙️ Papildomi nustatymai</span>
+                <div class="pt-0.5">
+                    <label class="flex items-center gap-1 text-[9px] font-bold text-gray-500 cursor-pointer select-none bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200/60 w-fit">
+                        <input type="checkbox" id="toggleAdvanced" onchange="toggleAdvancedFields()" class="rounded border-gray-300 text-gray-900 focus:ring-0 w-2.5 h-2.5">
+                        <span>⚙️ Papildomai</span>
                     </label>
                 </div>
 
-                <div id="advancedFields" class="hidden space-y-2.5 border-t border-dashed border-gray-200 pt-2">
+                <div id="advancedFields" class="hidden space-y-2 border-t border-dashed border-gray-200 pt-1.5">
                     <div>
-                        <label class="block text-[10px] font-bold text-indigo-600 uppercase tracking-wider mb-0.5">🔗 Susijusi nuoroda (Gmail, Drive, Katalogas...)</label>
-                        <input type="url" id="taskFileUrl" class="w-full border border-indigo-200 bg-indigo-50/20 rounded-lg p-2 outline-none text-xs" placeholder="Įklijuokite adresą...">
+                        <label class="block text-[9px] font-bold text-indigo-600 uppercase mb-0.5">🔗 Nuoroda</label>
+                        <input type="url" id="taskFileUrl" class="w-full border border-indigo-100 bg-indigo-50/10 rounded-md p-1.5 outline-none text-xs" placeholder="Gmail / Drive / URL">
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Prioritetas</label>
-                            <select id="taskPriority" class="w-full border border-gray-300 rounded-lg p-1.5 bg-white outline-none">
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">Prioritetas</label>
+                            <select id="taskPriority" class="w-full border border-gray-300 rounded-md p-1 bg-white outline-none">
                                 <option value="low">Žemas</option>
                                 <option value="medium" selected>Vidutinis</option>
                                 <option value="high">Skubu</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Kategorija</label>
-                            <select id="taskCategory" class="w-full border border-gray-300 rounded-lg p-1.5 bg-white outline-none">
+                            <label class="block text-[9px] font-bold text-gray-400 uppercase mb-0.5">Kategorija</label>
+                            <select id="taskCategory" class="w-full border border-gray-300 rounded-md p-1 bg-white outline-none">
                                 <option value="Užsakymai">Užsakymai</option>
                                 <option value="Gamyba / Tiekėjai">Gamyba / Tiekėjai</option>
                                 <option value="Marketingas">Marketingas</option>
@@ -191,44 +188,44 @@
                     </div>
                 </div>
 
-                <div class="bg-amber-50/40 p-2 rounded-lg border border-amber-200/50">
-                    <label class="block text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-1">📝 Darbo eigos užrašai / Komentarai</label>
-                    <div id="commentsContainer" class="space-y-1 mb-1.5 max-h-24 overflow-y-auto no-scrollbar text-[11px]"></div>
-                    <div class="flex gap-1.5">
-                        <input type="text" id="newCommentText" class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs outline-none bg-white" placeholder="Įrašykite naują info...">
-                        <button onclick="addCommentItem()" class="bg-gray-900 text-white px-2.5 py-1 rounded-md text-[10px] font-bold shrink-0">Pridėti</button>
+                <div class="bg-amber-50/40 p-2 rounded-lg border border-amber-200/40">
+                    <label class="block text-[9px] font-bold text-amber-800 uppercase mb-1">📝 Užrašai</label>
+                    <div id="commentsContainer" class="space-y-1 mb-1 max-h-20 overflow-y-auto no-scrollbar text-[11px]"></div>
+                    <div class="flex gap-1">
+                        <input type="text" id="newCommentText" class="flex-1 border border-gray-300 rounded-md px-2 py-0.5 text-xs outline-none bg-white" placeholder="...">
+                        <button onclick="addCommentItem()" class="bg-gray-900 text-white px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0">+</button>
                     </div>
                 </div>
 
                 <div class="bg-gray-50 p-2 rounded-lg border border-gray-200">
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sub-užduotys / Gamybos etapai</label>
-                    <div id="checklistContainer" class="space-y-1 mb-1.5"></div>
-                    <div class="flex gap-1.5">
-                        <input type="text" id="newChecklistItem" class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs outline-none" placeholder="Pvz.: Paruošti specifikaciją...">
-                        <button onclick="addChecklistItem()" class="bg-gray-200 text-gray-800 px-2.5 py-1 rounded-md text-[10px] font-bold shrink-0">+ Pridėti</button>
+                    <label class="block text-[9px] font-bold text-gray-500 uppercase mb-1">📋 Etapai</label>
+                    <div id="checklistContainer" class="space-y-1 mb-1"></div>
+                    <div class="flex gap-1">
+                        <input type="text" id="newChecklistItem" class="flex-1 border border-gray-300 rounded-md px-2 py-0.5 text-xs outline-none" placeholder="...">
+                        <button onclick="addChecklistItem()" class="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0">+</button>
                     </div>
                 </div>
             </div>
             
-            <div class="flex justify-between items-center border-t border-gray-100 pt-2.5 shrink-0 mt-2">
+            <div class="flex justify-between items-center border-t border-gray-100 pt-2 shrink-0 mt-1">
                 <button id="deleteBtn" onclick="deleteTask()" class="text-xs text-red-500 hover:text-red-700 font-bold hidden">Ištrinti</button>
-                <div class="flex space-x-2 ml-auto">
-                    <button onclick="closeModal()" class="px-4 py-1.5 text-gray-500 hover:bg-gray-100 rounded-xl font-medium">Atšaukti</button>
-                    <button onclick="saveTask()" class="px-5 py-1.5 bg-gray-900 text-white rounded-lg font-bold shadow-sm hover:bg-gray-800">Išsaugoti</button>
+                <div class="flex space-x-1.5 ml-auto">
+                    <button onclick="closeModal()" class="px-3 py-1 text-gray-500 hover:bg-gray-100 rounded-md font-medium">Atšaukti</button>
+                    <button onclick="saveTask()" class="px-4 py-1 bg-gray-900 text-white rounded-md font-bold hover:bg-gray-800">Išsaugoti</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-30 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-4 flex flex-col h-[70vh]">
-            <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
-                <h3 class="text-sm font-bold text-gray-900">Sistemos veiksmų žurnalas (Cloud)</h3>
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-4 flex flex-col h-[65vh]">
+            <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-1.5">
+                <h3 class="text-xs font-bold text-gray-900">Žurnalas</h3>
                 <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
-            <div id="historyList" class="flex-1 overflow-y-auto space-y-1.5 pr-1 no-scrollbar text-[11px]"></div>
-            <div class="flex justify-end border-t border-gray-100 pt-3 mt-3 shrink-0">
-                <button onclick="closeHistoryModal()" class="px-4 py-1.5 bg-gray-900 text-white rounded-xl text-xs font-bold">Uždaryti</button>
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-1 pr-1 no-scrollbar text-[11px]"></div>
+            <div class="flex justify-end border-t border-gray-100 pt-2 mt-2 shrink-0">
+                <button onclick="closeHistoryModal()" class="px-3 py-1 bg-gray-900 text-white rounded-md font-bold">Uždaryti</button>
             </div>
         </div>
     </div>
@@ -260,7 +257,7 @@
         let currentLayout = localStorage.getItem('houmy_layout') || 'kanban'; 
         
         let totalStorageSize = 0;
-        const MAX_STORAGE_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB Limit
+        const MAX_STORAGE_BYTES = 5 * 1024 * 1024 * 1024; 
 
         function toggleAdvancedFields() {
             const checkbox = document.getElementById('toggleAdvanced');
@@ -285,25 +282,25 @@
             const statuses = ['todo', 'progress', 'done'];
 
             if (currentLayout === 'rows') {
-                if (boardWrapper) boardWrapper.className = "flex flex-col gap-3 max-w-6xl mx-auto";
+                if (boardWrapper) boardWrapper.className = "flex flex-col gap-2 max-w-6xl mx-auto";
                 statuses.forEach(status => {
                     const colEl = document.getElementById(`col-${status}`);
                     const tasksEl = document.getElementById(`tasks-${status}`);
-                    if (colEl) colEl.className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/20 border-blue-100' : 'bg-green-50/20 border-green-100'} rounded-xl p-2.5 border flex flex-col gap-1.5`;
+                    if (colEl) colEl.className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200' : status === 'progress' ? 'bg-blue-50/10 border-blue-100/60' : 'bg-green-50/10 border-green-100/60'} rounded-xl p-2 border flex flex-col gap-1`;
                     if (tasksEl) tasksEl.className = "flex flex-col gap-1 w-full";
                 });
-                if (btnRows) btnRows.className = "px-2.5 py-1 rounded-md font-bold transition bg-white shadow-sm text-gray-900 text-[11px]";
-                if (btnKanban) btnKanban.className = "px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]";
+                if (btnRows) btnRows.className = "px-2 py-0.5 rounded font-bold transition bg-white shadow-sm text-gray-900 text-[11px]";
+                if (btnKanban) btnKanban.className = "px-2 py-0.5 rounded font-bold transition text-gray-500 hover:text-gray-900 text-[11px]";
             } else {
-                if (boardWrapper) boardWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto";
+                if (boardWrapper) boardWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-3 max-w-6xl mx-auto";
                 statuses.forEach(status => {
                     const colEl = document.getElementById(`col-${status}`);
                     const tasksEl = document.getElementById(`tasks-${status}`);
-                    if (colEl) colEl.className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200/80' : status === 'progress' ? 'bg-blue-50/20 border-blue-100' : 'bg-green-50/20 border-green-100'} rounded-xl p-3 border flex flex-col`;
-                    if (tasksEl) tasksEl.className = "space-y-2 flex-1 min-h-[250px] pt-0.5";
+                    if (colEl) colEl.className = `kanban-col ${status === 'todo' ? 'bg-gray-50 border-gray-200/80' : status === 'progress' ? 'bg-blue-50/10 border-blue-100/60' : 'bg-green-50/10 border-green-100/60'} rounded-xl p-2 flex flex-col`;
+                    if (tasksEl) tasksEl.className = "space-y-1.5 flex-1 min-h-[220px] pt-0.5";
                 });
-                if (btnKanban) btnKanban.className = "px-2.5 py-1 rounded-md font-bold transition bg-white shadow-sm text-gray-900 text-[11px]";
-                if (btnRows) btnRows.className = "px-2.5 py-1 rounded-md font-bold transition text-gray-500 hover:text-gray-900 text-[11px]";
+                if (btnKanban) btnKanban.className = "px-2 py-0.5 rounded font-bold transition bg-white shadow-sm text-gray-900 text-[11px]";
+                if (btnRows) btnRows.className = "px-2 py-0.5 rounded font-bold transition text-gray-500 hover:text-gray-900 text-[11px]";
             }
         }
 
@@ -328,25 +325,18 @@
             }
         }
 
-        // 🛡️ SUTVARKUOTA APSAUGA (TIK SU 5 GB LIMITU)
         async function handleFileUpload(file, targetMember) {
             if (totalStorageSize + file.size > MAX_STORAGE_BYTES) {
-                alert(`🚨 BLOKUOJAMA: Failas netelpa! Nemokama 5.0 GB saugyklos talpa bus pilnai viršyta. Ištrinkite senus brėžinius/failus iš Failinės.`);
-                return;
+                alert(`Talpa pilna!`); return;
             }
-
             const savedSender = localStorage.getItem('houmy_user_name') || "Ramūnas";
-            const sender = prompt(`Kas siunčia failą „${file.name}“?`, savedSender);
-            if (!sender) return;
+            const sender = prompt(`Kas siunčia?`, savedSender); if (!sender) return;
             localStorage.setItem('houmy_user_name', sender);
-            
             const targetName = targetMember === 'all' ? 'VISIEMS' : targetMember;
-            logAction(`Failas: „${file.name}“ ➔ Kam: ${targetName}`);
 
             try {
                 const fileRef = ref(storage, `houmy_shared/${Date.now()}_${file.name}`);
                 const metadata = { contentDisposition: `attachment; filename="${file.name}"` };
-                
                 const snapshot = await uploadBytes(fileRef, file, metadata);
                 const downloadUrl = await getDownloadURL(snapshot.ref);
 
@@ -355,64 +345,39 @@
                     size: file.size, 
                     dateStr: new Date().toLocaleDateString('lt-LT') + ' ' + new Date().toLocaleTimeString('lt-LT', {hour: '2-digit', minute:'2-digit'})
                 });
-                logAction(`Įkeltas failas: „${file.name}“`);
-            } catch (error) {
-                alert("Klaida keliant failą!");
-                console.error(error);
-            }
+                logAction(`Įkeltas failas`);
+            } catch (error) { console.error(error); }
         }
 
         function updateStorageBarUI() {
-            const txt = document.getElementById('storageText');
-            const bar = document.getElementById('storageBar');
-            const pctText = document.getElementById('storagePct');
+            const txt = document.getElementById('storageText'); const bar = document.getElementById('storageBar'); const pctText = document.getElementById('storagePct');
             if (!txt || !bar || !pctText) return;
-
-            const usedMB = (totalStorageSize / (1024 * 1024)).toFixed(1);
-            const pct = Math.min(((totalStorageSize / MAX_STORAGE_BYTES) * 100), 100).toFixed(1);
-
-            txt.innerText = `Saugykla: ${usedMB} MB / 5.0 GB`;
-            pctText.innerText = `${pct}%`;
-            bar.style.width = `${pct}%`;
-
-            if (pct > 90) bar.className = "bg-red-600 h-1.5 transition-all duration-300";
-            else if (pct > 70) bar.className = "bg-amber-500 h-1.5 transition-all duration-300";
-            else bar.className = "bg-indigo-600 h-1.5 transition-all duration-300";
+            const usedMB = (totalStorageSize / (1024 * 1024)).toFixed(1); const pct = Math.min(((totalStorageSize / MAX_STORAGE_BYTES) * 100), 100).toFixed(1);
+            txt.innerText = `${usedMB} MB / 5.0 GB`; pctText.innerText = `${pct}%`; bar.style.width = `${pct}%`;
+            if (pct > 90) bar.className = "bg-red-600 h-1 transition-all"; else if (pct > 70) bar.className = "bg-amber-500 h-1 transition-all"; else bar.className = "bg-indigo-600 h-1 transition-all";
         }
 
         async function deleteSharedFile(id, storagePath, name) {
-            if (confirm(`Ar ištrinti failą „${name}“?`)) {
-                try {
-                    await deleteDoc(doc(db, "shared_files", id));
-                    await deleteObject(ref(storage, storagePath));
-                    logAction(`Ištrintas failas: „${name}“`);
-                } catch (e) { console.error(e); }
+            if (confirm(`Ištrinti failą?`)) {
+                try { await deleteDoc(doc(db, "shared_files", id)); await deleteObject(ref(storage, storagePath)); logAction(`Ištrintas failas`); } catch (e) { console.error(e); }
             }
         }
 
         function renderFileShelf() {
             const container = document.getElementById('fileShelfContainer'); if (!container) return;
             container.innerHTML = '';
-            if (sharedFiles.length === 0) {
-                container.innerHTML = `<div class="text-gray-400 text-xs py-6 text-center col-span-full italic">Failinė tuščia.</div>`;
-                return;
-            }
+            if (sharedFiles.length === 0) { container.innerHTML = `<div class="text-gray-400 text-xs py-4 text-center col-span-full italic">Tuščia.</div>`; return; }
             sharedFiles.forEach(file => {
-                const item = document.createElement('div');
-                item.className = 'bg-gray-50 p-2 rounded-lg border border-gray-200 flex flex-col justify-between relative group';
-                const fSize = file.size ? (file.size / (1024 * 1024)).toFixed(2) + ' MB' : '—';
-                
+                const item = document.createElement('div'); item.className = 'bg-gray-50 p-2 rounded-md border border-gray-200 flex flex-col justify-between relative group';
+                const fSize = file.size ? (file.size / (1024 * 1024)).toFixed(1) + 'M' : '';
                 item.innerHTML = `
-                    <button onclick="deleteSharedFile('${file.id}', '${file.storagePath}', '${file.name}')" class="absolute top-1 right-1.5 text-gray-300 hover:text-red-500 font-bold text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
+                    <button onclick="deleteSharedFile('${file.id}', '${file.storagePath}', '${file.name}')" class="absolute top-0.5 right-1 text-gray-300 hover:text-red-500 font-bold text-xs opacity-0 group-hover:opacity-100">✕</button>
                     <div>
-                        <div class="text-[9px] text-gray-400 font-mono mb-0.5">${file.dateStr} <span class="ml-1 text-gray-400/80">(${fSize})</span></div>
-                        <div class="text-[11px] font-bold text-gray-900 truncate pr-3" title="${file.name}">📄 ${file.name}</div>
-                        <div class="mt-1 flex gap-1 text-[9px]">
-                            <span class="text-gray-500">Nuo: ${file.from}</span>
-                            <span class="text-indigo-600 font-bold">Kam: ${file.to}</span>
-                        </div>
+                        <div class="text-[8px] text-gray-400 font-mono">${file.dateStr} [${fSize}]</div>
+                        <div class="text-[11px] font-bold text-gray-900 truncate" title="${file.name}">📄 ${file.name}</div>
+                        <div class="text-[9px] text-gray-500">${file.from} ➔ ${file.to}</div>
                     </div>
-                    <button onclick="forceDownload('${file.url}', '${file.name}')" class="mt-2 block w-full text-center bg-indigo-600 text-white text-[10px] font-bold py-1 rounded hover:bg-indigo-700 transition">Atsisiųsti 📥</button>
+                    <button onclick="forceDownload('${file.url}', '${file.name}')" class="mt-1 bg-indigo-600 text-white text-[10px] font-bold py-0.5 rounded hover:bg-indigo-700">Atsisiųsti</button>
                 `;
                 container.appendChild(item);
             });
@@ -420,50 +385,30 @@
 
         function openCreateModal() {
             currentChecklist = []; currentComments = [];
-            document.getElementById('modalTitle').innerText = 'Sukurti naują užduotį';
+            document.getElementById('modalTitle').innerText = 'Nauja';
             document.getElementById('editingId').value = '';
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskDesc').value = '';
-            document.getElementById('taskFileUrl').value = '';
-            document.getElementById('taskDate').value = '';
-            document.getElementById('taskPriority').value = 'medium';
-            document.getElementById('taskCategory').value = 'Kita';
+            document.getElementById('taskTitle').value = ''; document.getElementById('taskDesc').value = ''; document.getElementById('taskFileUrl').value = ''; document.getElementById('taskDate').value = '';
+            document.getElementById('taskPriority').value = 'medium'; document.getElementById('taskCategory').value = 'Kita';
             document.getElementById('deleteBtn').classList.add('hidden');
-            
-            const checkbox = document.getElementById('toggleAdvanced');
-            if (checkbox) checkbox.checked = false;
-            toggleAdvancedFields();
-
-            renderChecklistDOM(); renderCommentsDOM();
+            const checkbox = document.getElementById('toggleAdvanced'); if (checkbox) checkbox.checked = false;
+            toggleAdvancedFields(); renderChecklistDOM(); renderCommentsDOM();
             document.getElementById('taskModal').classList.remove('hidden');
         }
 
         function openEditModal(id) {
             const task = tasks.find(t => t.id === id); if (!task) return;
-            currentChecklist = Array.isArray(task.checklist) ? task.checklist : [];
-            currentComments = Array.isArray(task.comments) ? task.comments : [];
-            document.getElementById('modalTitle').innerText = 'Redaguoti užduotį';
+            currentChecklist = Array.isArray(task.checklist) ? task.checklist : []; currentComments = Array.isArray(task.comments) ? task.comments : [];
+            document.getElementById('modalTitle').innerText = 'Redaguoti';
             document.getElementById('editingId').value = task.id;
-            document.getElementById('taskTitle').value = task.title || '';
-            document.getElementById('taskDesc').value = task.desc || '';
-            document.getElementById('taskFileUrl').value = task.fileUrl || '';
-            document.getElementById('taskDate').value = task.date || '';
-            document.getElementById('taskPriority').value = task.priority || 'medium';
-            document.getElementById('taskCategory').value = task.category || 'Kita';
+            document.getElementById('taskTitle').value = task.title || ''; document.getElementById('taskDesc').value = task.desc || '';
+            document.getElementById('taskFileUrl').value = task.fileUrl || ''; document.getElementById('taskDate').value = task.date || '';
+            document.getElementById('taskPriority').value = task.priority || 'medium'; document.getElementById('taskCategory').value = task.category || 'Kita';
             document.getElementById('taskAssignee').value = task.assignee || 'Ramūnas';
             document.getElementById('deleteBtn').classList.remove('hidden');
             
             const checkbox = document.getElementById('toggleAdvanced');
-            if (checkbox) {
-                if (task.fileUrl || (task.priority && task.priority !== 'medium') || (task.category && task.category !== 'Kita')) {
-                    checkbox.checked = true;
-                } else {
-                    checkbox.checked = false;
-                }
-            }
-            toggleAdvancedFields();
-
-            renderChecklistDOM(); renderCommentsDOM();
+            if (checkbox) checkbox.checked = !!(task.fileUrl || (task.priority && task.priority !== 'medium') || (task.category && task.category !== 'Kita'));
+            toggleAdvancedFields(); renderChecklistDOM(); renderCommentsDOM();
             document.getElementById('taskModal').classList.remove('hidden');
         }
 
@@ -479,13 +424,13 @@
             const container = document.getElementById('checklistContainer'); if (!container) return;
             container.innerHTML = '';
             currentChecklist.forEach((item, idx) => {
-                const div = document.createElement('div'); div.className = 'flex items-center justify-between bg-white p-1.5 border border-gray-200 rounded-lg text-xs';
+                const div = document.createElement('div'); div.className = 'flex items-center justify-between bg-white p-1 border border-gray-200 rounded';
                 div.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleChecklistState(${idx})" class="w-3.5 h-3.5 text-gray-900 border-gray-300 rounded focus:ring-gray-900">
+                    <div class="flex items-center gap-1.5 text-xs">
+                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleChecklistState(${idx})" class="w-3.5 h-3.5 border-gray-300 text-gray-900 rounded focus:ring-0">
                         <span class="${item.done ? 'line-through text-gray-400' : 'text-gray-700'}">${item.text || ''}</span>
                     </div>
-                    <button onclick="removeChecklistItem(${idx})" class="text-red-400 hover:text-red-600 text-[11px] font-bold px-1">✕</button>
+                    <button onclick="removeChecklistItem(${idx})" class="text-red-400 font-bold text-[10px] px-1">✕</button>
                 `;
                 container.appendChild(div);
             });
@@ -501,14 +446,12 @@
         function renderCommentsDOM() {
             const container = document.getElementById('commentsContainer'); if (!container) return;
             container.innerHTML = '';
-            if (currentComments.length === 0) {
-                container.innerHTML = `<div class="text-gray-400 italic text-[10px]">Užrašų nėra.</div>`; return;
-            }
+            if (currentComments.length === 0) { container.innerHTML = `<div class="text-gray-400 italic text-[9px]">Nėra.</div>`; return; }
             currentComments.forEach((item) => {
-                const div = document.createElement('div'); div.className = 'bg-white p-1.5 border border-amber-100 rounded shadow-sm';
+                const div = document.createElement('div'); div.className = 'bg-white p-1 border border-amber-100 rounded shadow-sm';
                 div.innerHTML = `
-                    <div class="flex justify-between text-[9px] text-gray-400 mb-0.5"><span class="text-amber-800 font-bold">${item.author || ''}</span><span>${item.time || ''}</span></div>
-                    <div class="text-gray-700 text-[11px] leading-tight">${item.text || ''}</div>
+                    <div class="flex justify-between text-[8px] text-gray-400"><span class="text-amber-800 font-bold">${item.author || ''}</span><span>${item.time || ''}</span></div>
+                    <div class="text-gray-700 text-[10px] leading-tight">${item.text || ''}</div>
                 `;
                 container.appendChild(div);
             });
@@ -518,11 +461,11 @@
         function openHistoryModal() {
             const listContainer = document.getElementById('historyList'); if (!listContainer) return;
             listContainer.innerHTML = '';
-            if (historyLog.length === 0) { listContainer.innerHTML = `<div class="text-gray-400 text-center py-4">Žurnalas tuščias.</div>`; } 
+            if (historyLog.length === 0) { listContainer.innerHTML = `<div class="text-gray-400 text-center py-2">Tuščia.</div>`; } 
             else {
                 historyLog.forEach(item => {
-                    const el = document.createElement('div'); el.className = 'p-1.5 bg-gray-50 border border-gray-100 rounded flex gap-2 items-baseline';
-                    el.innerHTML = `<span class="text-[9px] font-mono bg-gray-200 text-gray-500 px-1 rounded shrink-0">${item.time || ''}</span> <span class="text-gray-600">${item.text || ''}</span>`;
+                    const el = document.createElement('div'); el.className = 'p-1 bg-gray-50 border border-gray-100 rounded flex gap-2 items-baseline';
+                    el.innerHTML = `<span class="text-[8px] font-mono text-gray-400 shrink-0">${item.time || ''}</span> <span class="text-gray-600">${item.text || ''}</span>`;
                     listContainer.appendChild(el);
                 });
             }
@@ -552,14 +495,14 @@
                 await updateDoc(doc(db, "tasks", id), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, comments: currentComments, isTransferred: wasTransferred ? true : (oldTask ? oldTask.isTransferred : false) });
             } else {
                 await addDoc(collection(db, "tasks"), { title, desc, fileUrl, assignee, date, priority, category, checklist: currentChecklist, comments: currentComments, status: 'todo', createdAt: todayStr, isTransferred: false });
-                logAction(`Sukurta užduotis: „${title}“`);
+                logAction(`Sukurta: „${title}“`);
             }
             closeModal();
         }
 
         async function deleteTask() {
             const id = document.getElementById('editingId').value;
-            if (id && confirm('Ištrinti užduotį?')) { const task = tasks.find(t => t.id === id); if (task) logAction(`Ištrinta: „${task.title}“`); await deleteDoc(doc(db, "tasks", id)); closeModal(); }
+            if (id && confirm('Ištrinti?')) { const task = tasks.find(t => t.id === id); if (task) logAction(`Ištrinta: „${task.title}“`); await deleteDoc(doc(db, "tasks", id)); closeModal(); }
         }
 
         function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
@@ -577,7 +520,7 @@
             ev.preventDefault(); const btn = document.getElementById(`filter-${newAssignee}`); if (btn) btn.classList.remove('bg-indigo-50', 'file-hover');
             if (ev.dataTransfer.files && ev.dataTransfer.files.length > 0) { const file = ev.dataTransfer.files[0]; await handleFileUpload(file, newAssignee); updateFilterButtonUI(); return; }
             const id = ev.dataTransfer.getData("text/plain"); const task = tasks.find(t => t.id === id);
-            if (task && newAssignee !== 'all' && task.assignee !== newAssignee) { logAction(`„${task.title}“ pervilkta ➔ ${newAssignee}`); await updateDoc(doc(db, "tasks", id), { assignee: newAssignee, isTransferred: true }); } else { updateFilterButtonUI(); }
+            if (task && newAssignee !== 'all' && task.assignee !== newAssignee) { logAction(`„${task.title}“ ➔ ${newAssignee}`); await updateDoc(doc(db, "tasks", id), { assignee: newAssignee, isTransferred: true }); } else { updateFilterButtonUI(); }
         }
 
         async function drop(ev, newStatus) {
@@ -600,8 +543,7 @@
 
             const filtered = sorted.filter(t => {
                 const matchAssignee = (currentFilter === 'all' || t.assignee === currentFilter);
-                const titleStr = (t.title || '').toLowerCase(); const descStr = (t.desc || '').toLowerCase();
-                return matchAssignee && (titleStr.includes(searchQuery) || descStr.includes(searchQuery));
+                return matchAssignee && ((t.title || '').toLowerCase().includes(searchQuery) || (t.desc || '').toLowerCase().includes(searchQuery));
             });
 
             filtered.forEach(task => {
@@ -609,83 +551,75 @@
                 if (currentStatus === 'done' && task.completedAt && new Date(task.completedAt) < oneWeekAgo) return;
                 if (globalCounts[currentStatus] !== undefined) globalCounts[currentStatus]++;
 
-                let dateBadgeStyle = "text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded text-[10px]";
+                let dateBadgeStyle = "text-gray-500 bg-gray-100 border border-gray-200 px-1 rounded text-[9px]";
                 if (task.date && currentStatus !== 'done') {
-                    const taskDeadline = new Date(task.date); taskDeadline.setHours(0,0,0,0);
-                    if (taskDeadline < today) { dateBadgeStyle = "text-red-700 bg-red-50 font-bold border border-red-200 px-1.5 py-0.5 rounded text-[10px] animate-pulse"; }
+                    if (new Date(task.date).setHours(0,0,0,0) < today) dateBadgeStyle = "text-red-700 bg-red-50 font-bold border border-red-200 px-1 rounded text-[9px] animate-pulse";
                 }
 
-                const pDot = `<span class="w-2.5 h-2.5 rounded-full ${priorityDots[task.priority || 'medium']} shrink-0"></span>`;
-                const catBadge = task.category ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
-                const transferBadge = task.isTransferred ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-indigo-50 text-indigo-600 border border-indigo-100">🔄</span>` : '';
+                const pDot = `<span class="w-2 h-2 rounded-full ${priorityDots[task.priority || 'medium']} shrink-0"></span>`;
+                const catBadge = task.category ? `<span class="text-[9px] px-1 rounded font-bold ${categoryStyles[task.category] || categoryStyles['Kita']}">${task.category}</span>` : '';
+                const transferBadge = task.isTransferred ? `<span class="text-[9px] font-bold text-indigo-600">🔄</span>` : '';
 
                 let commentBadgeHTML = "";
                 if (Array.isArray(task.comments) && task.comments.length > 0) {
                     const lastComment = task.comments[task.comments.length - 1];
-                    commentBadgeHTML = `<div class="mt-1.5 text-[11px] bg-amber-50/70 border border-amber-200/50 p-1.5 rounded-md text-gray-700 line-clamp-2 shadow-sm" title="${lastComment.author}: ${lastComment.text}">
-                        <span class="font-bold text-amber-900">📝 ${lastComment.author || ''}:</span> ${lastComment.text || ''}
-                    </div>`;
+                    commentBadgeHTML = `<div class="mt-1 text-[10px] bg-amber-50/70 border border-amber-200/40 p-1 rounded text-gray-600 line-clamp-1"><span class="font-bold text-amber-900">${lastComment.author || ''}:</span> ${lastComment.text || ''}</div>`;
                 }
 
-                let linkLabel = "🔗 Nuoroda"; let linkStyle = "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100";
+                let linkLabel = "🔗 Nuoroda"; let linkStyle = "bg-indigo-50 border-indigo-100 text-indigo-700";
                 if (task.fileUrl) {
-                    if (task.fileUrl.includes("mail.google.com")) { linkLabel = "📧 Gmail"; linkStyle = "bg-red-50 border-red-100 text-red-600 hover:bg-red-100"; } 
-                    else if (task.fileUrl.includes("drive.google.com") || task.fileUrl.includes("docs.google.com")) { linkLabel = "📁 Drive"; linkStyle = "bg-green-50 border-green-100 text-green-600 hover:bg-green-100"; }
+                    if (task.fileUrl.includes("mail.google.com")) { linkLabel = "📧 Gmail"; linkStyle = "bg-red-50 border-red-100 text-red-600"; } 
+                    else if (task.fileUrl.includes("drive.google.com") || task.fileUrl.includes("docs.google.com")) { linkLabel = "📁 Drive"; linkStyle = "bg-green-50 border-green-100 text-green-600"; }
                 }
 
                 const card = document.createElement('div'); card.setAttribute('draggable', 'true');
                 card.addEventListener('dragstart', (e) => drag(e, task.id)); card.onclick = () => openEditModal(task.id);
 
                 if (currentLayout === 'rows') {
-                    let checklistMini = (Array.isArray(task.checklist) && task.checklist.length > 0) ? `<span class="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">📋 ${task.checklist.filter(i => i && i.done).length}/${task.checklist.length}</span>` : '';
-                    let fileIcon = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="${linkStyle} font-bold text-[10px] px-2 py-0.5 rounded border transition shadow-sm">${linkLabel}</button>` : '';
+                    let checklistMini = (Array.isArray(task.checklist) && task.checklist.length > 0) ? `<span class="text-[9px] text-gray-400 bg-gray-100 px-1 rounded">📋 ${task.checklist.filter(i => i && i.done).length}/${task.checklist.length}</span>` : '';
+                    let fileIcon = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="${linkStyle} font-bold text-[9px] px-1.5 py-0.5 rounded border transition shadow-sm">${linkLabel}</button>` : '';
 
-                    card.className = "task-card bg-white p-2 rounded-xl shadow-sm border border-gray-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 w-full text-[11px]";
+                    card.className = "task-card bg-white p-1.5 rounded-lg shadow-sm border border-gray-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 w-full text-[11px]";
                     card.innerHTML = `
                         <div class="flex items-center gap-2 flex-1 min-w-0">
                             ${pDot}
-                            <div class="truncate flex items-baseline gap-2">
-                                <h4 class="font-bold text-gray-900">${task.title || 'Be pavadinimo'}</h4>
-                                ${commentBadgeHTML ? `<span class="text-amber-700 font-medium text-[10px] max-w-xs truncate">${commentBadgeHTML.replace(/<\/?[^>]+(>|$)/g, "")}</span>` : task.desc ? `<span class="text-gray-400 text-[10px] truncate max-w-xs">— ${task.desc}</span>` : ''}
+                            <div class="truncate flex items-baseline gap-1.5">
+                                <h4 class="font-bold text-gray-900">${task.title || '—'}</h4>
+                                ${commentBadgeHTML ? `<span class="text-amber-700 text-[9px] max-w-[200px] truncate">${commentBadgeHTML.replace(/<\/?[^>]+(>|$)/g, "")}</span>` : task.desc ? `<span class="text-gray-400 text-[9px] truncate max-w-[200px]">— ${task.desc}</span>` : ''}
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+                        <div class="flex items-center gap-1.5 shrink-0">
                             ${catBadge} ${transferBadge} ${checklistMini} ${fileIcon}
-                            <span class="${dateBadgeStyle}">${task.date ? '🏁 ' + task.date : 'Nėra termino'}</span>
-                            <span class="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200 min-w-[65px] text-center">${task.assignee || '—'}</span>
+                            <span class="${dateBadgeStyle}">${task.date ? task.date : '—'}</span>
+                            <span class="text-[9px] font-bold bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200 text-center min-w-[55px]">${task.assignee || '—'}</span>
                         </div>
                     `;
                 } else {
-                    let checklistHTML = "";
-                    if (Array.isArray(task.checklist) && task.checklist.length > 0) {
-                        const total = task.checklist.length; const doneCount = task.checklist.filter(item => item && item.done).length; const pct = Math.round((doneCount / total) * 100);
-                        checklistHTML = `<div class="mt-1.5 flex items-center gap-2 text-[10px] text-gray-400 font-medium"><span>📋 ${doneCount}/${total}</span><div class="flex-1 bg-gray-200 h-1 rounded-full overflow-hidden"><div class="bg-gray-700 h-1 transition-all duration-300" style="width: ${pct}%"></div></div></div>`;
-                    }
-                    let fileButtonHTML = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="mt-1.5 inline-flex items-center justify-center gap-1 w-full ${linkStyle} border text-[10px] font-bold py-1 rounded transition shadow-sm">${linkLabel}</button>` : '';
+                    let checklistHTML = (Array.isArray(task.checklist) && task.checklist.length > 0) ? `<div class="mt-1 text-[9px] text-gray-400 font-medium">📋 ${task.checklist.filter(item => item && item.done).length}/${task.checklist.length}</div>` : '';
+                    let fileButtonHTML = task.fileUrl ? `<button onclick="event.stopPropagation(); forceDownload('${task.fileUrl}', 'nuoroda')" class="mt-1 w-full ${linkStyle} border text-[9px] font-bold py-0.5 rounded transition shadow-sm">${linkLabel}</button>` : '';
 
-                    card.className = "task-card bg-white p-2.5 rounded-xl shadow-sm border border-gray-200 relative w-full";
+                    card.className = "task-card bg-white p-2 rounded-lg shadow-sm border border-gray-200/80 w-full";
                     card.innerHTML = `
-                        <div class="flex justify-between items-center mb-1.5"><div class="flex flex-wrap gap-1 items-center">${pDot}${catBadge}${transferBadge}</div><span class="text-[10px] font-bold bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-100">${task.assignee || '—'}</span></div>
-                        <h4 class="font-bold text-gray-900 text-xs mb-0.5 tracking-wide leading-snug">${task.title || 'Be pavadinimo'}</h4>
-                        ${task.desc ? `<p class="text-gray-400 text-[11px] leading-tight mb-1 line-clamp-2">${task.desc}</p>` : ''}
+                        <div class="flex justify-between items-center mb-1"><div class="flex gap-1 items-center">${pDot}${catBadge}${transferBadge}</div><span class="text-[9px] font-bold text-gray-400 bg-gray-50 px-1 rounded border border-gray-100">${task.assignee || '—'}</span></div>
+                        <h4 class="font-bold text-gray-900 text-xs mb-0.5 leading-snug">${task.title || '—'}</h4>
+                        ${task.desc ? `<p class="text-gray-400 text-[10px] leading-tight mb-0.5 line-clamp-1">${task.desc}</p>` : ''}
                         ${commentBadgeHTML} ${checklistHTML} ${fileButtonHTML}
-                        <div class="flex justify-between items-center text-[9px] text-gray-400 mt-2 pt-1.5 border-t border-gray-100/60"><div>⏱️ ${task.createdAt || ''}</div>${task.date ? `<div class="${dateBadgeStyle}">🏁 ${task.date}</div>` : ''}</div>
+                        <div class="flex justify-between items-center text-[8px] text-gray-400 mt-1.5 pt-1 border-t border-gray-100/60"><div>⏱️ ${task.createdAt || ''}</div>${task.date ? `<div class="${dateBadgeStyle}">🏁 ${task.date}</div>` : ''}</div>
                     `;
                 }
                 const targetList = lists[currentStatus]; if (targetList) targetList.appendChild(card);
             });
-            const cTodo = document.getElementById('count-todo'); if (cTodo) cTodo.innerText = globalCounts.todo;
-            const cProgress = document.getElementById('count-progress'); if (cProgress) cProgress.innerText = globalCounts.progress;
-            const cDone = document.getElementById('count-done'); if (cDone) cDone.innerText = globalCounts.done;
+            if (document.getElementById('count-todo')) document.getElementById('count-todo').innerText = globalCounts.todo;
+            if (document.getElementById('count-progress')) document.getElementById('count-progress').innerText = globalCounts.progress;
+            if (document.getElementById('count-done')) document.getElementById('count-done').innerText = globalCounts.done;
         }
 
         function setFilter(member) { currentFilter = member; updateFilterButtonUI(); renderTasks(); }
         function updateFilterButtonUI() {
             const buttons = ['all', 'Ramūnas', 'Ingrida', 'Aušrinė'];
-            buttons.forEach(b => { const btn = document.getElementById(`filter-${b}`); if (btn) btn.className = b === currentFilter ? "px-3 py-1.5 rounded-lg font-bold transition bg-gray-900 text-white shadow-sm border border-transparent" : "px-3 py-1.5 rounded-lg font-bold transition text-gray-500 hover:bg-gray-100 border border-transparent"; });
+            buttons.forEach(b => { const btn = document.getElementById(`filter-${b}`); if (btn) btn.className = b === currentFilter ? "px-2.5 py-1 rounded-md font-bold transition bg-gray-900 text-white shadow-sm" : "px-2.5 py-1 rounded-md font-bold transition text-gray-400 hover:bg-gray-50"; });
         }
 
-        // 🚀 2. REZERVAVIMAS WINDOW OBJEKTE
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
@@ -697,24 +631,12 @@
         window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile; window.handleShelfFileSelect = handleShelfFileSelect;
         window.forceDownload = forceDownload; window.addCommentItem = addCommentItem; window.toggleAdvancedFields = toggleAdvancedFields;
 
-        // 🛡️ 3. SAUGUS DUOMENŲ PALEIDIMAS
         try { updateLayoutUI(); } catch (e) { console.error(e); }
-
         try {
             onSnapshot(query(collection(db, "shared_files"), orderBy("timestamp", "desc"), limit(100)), (snapshot) => {
-                sharedFiles = [];
-                totalStorageSize = 0; 
-                
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    sharedFiles.push({ id: doc.id, ...data });
-                    if (data.size) totalStorageSize += data.size; 
-                });
-                
-                try { 
-                    renderFileShelf(); 
-                    updateStorageBarUI(); 
-                } catch(err) { console.error(err); }
+                sharedFiles = []; totalStorageSize = 0;
+                snapshot.forEach((doc) => { const data = doc.data(); sharedFiles.push({ id: doc.id, ...data }); if (data.size) totalStorageSize += data.size; });
+                try { renderFileShelf(); updateStorageBarUI(); } catch(err) { console.error(err); }
             });
             onSnapshot(collection(db, "tasks"), (snapshot) => {
                 tasks = []; snapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
