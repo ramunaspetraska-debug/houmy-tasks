@@ -361,7 +361,6 @@
             }
         }
 
-        // Išvalyta failinės lentyna modale
         function renderFileShelf() {
             const container = document.getElementById('fileShelfContainer'); if (!container) return;
             container.innerHTML = '';
@@ -529,7 +528,6 @@
         }
 
         function renderTasks() {
-            // Saugus taisyklių aprašymas funkcijos viduje
             const priorityDots = { high: 'bg-red-500 shadow-sm', medium: 'bg-amber-400 shadow-sm', low: 'bg-green-500 shadow-sm' };
             const categoryStyles = { 'Užsakymai': 'bg-purple-50 text-purple-700', 'Gamyba / Tiekėjai': 'bg-blue-50 text-blue-700', 'Marketingas': 'bg-pink-50 text-pink-700', 'Kita': 'bg-gray-100 text-gray-600' };
 
@@ -623,6 +621,7 @@
             buttons.forEach(b => { const btn = document.getElementById(`filter-${b}`); if (btn) btn.className = b === currentFilter ? "px-2.5 py-1 rounded-md font-bold transition bg-gray-900 text-white shadow-sm" : "px-2.5 py-1 rounded-md font-bold transition text-gray-400 hover:bg-gray-50"; });
         }
 
+        // 🚀 2. REZERVAVIMAS WINDOW OBJEKTE
         window.openCreateModal = openCreateModal; window.openEditModal = openEditModal; window.closeModal = closeModal;
         window.saveTask = saveTask; window.deleteTask = deleteTask; window.setFilter = setFilter;
         window.allowDrop = allowDrop; window.drop = drop; window.dropAssignee = dropAssignee;
@@ -634,6 +633,7 @@
         window.setLayout = setLayout; window.deleteSharedFile = deleteSharedFile; window.handleShelfFileSelect = handleShelfFileSelect;
         window.forceDownload = forceDownload; window.addCommentItem = addCommentItem; window.toggleAdvancedFields = toggleAdvancedFields;
 
+        // 🛡️ 3. SAUGUS DUOMENŲ PALEIDIMAS
         try { updateLayoutUI(); } catch (e) { console.error(e); }
         try {
             onSnapshot(query(collection(db, "shared_files"), orderBy("timestamp", "desc"), limit(100)), (snapshot) => {
